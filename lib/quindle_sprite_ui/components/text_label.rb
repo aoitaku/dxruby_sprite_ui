@@ -1,4 +1,4 @@
-class UI::TextLabel < SpriteUI::Base
+class Quindle::UI::TextLabel < Quindle::SpriteUI::Base
 
   attr_reader :text, :font
   attr_accessor :color
@@ -46,7 +46,7 @@ class UI::TextLabel < SpriteUI::Base
   end
 
   def context
-    Context[target, font]
+    Quindle::Context[target, font]
   end
 
   def draw_params

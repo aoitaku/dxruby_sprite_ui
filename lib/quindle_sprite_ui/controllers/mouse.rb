@@ -1,6 +1,6 @@
 require 'weakref'
 
-class SpriteUI::Mouse < Sprite
+class Quindle::SpriteUI::Mouse < Sprite
 
   attr_reader :hover, :prev
 
@@ -56,9 +56,9 @@ class SpriteUI::Mouse < Sprite
 
 end
 
-class SpriteUI::MouseEventDispatcher
+class Quindle::SpriteUI::MouseEventDispatcher
 
-  include UI::EventDispatcher
+  include Quindle::UI::EventDispatcher
 
   attr_reader :mouse, :mouse_prev
 

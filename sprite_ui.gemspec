@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'sprite_ui/version'
+require 'quindle_sprite_ui/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "sprite_ui"
-  spec.version       = SpriteUI::VERSION
+  spec.name          = "quindle_sprite_ui"
+  spec.version       = Quindle::SpriteUI::VERSION
   spec.authors       = ["aoitaku"]
   spec.email         = ["aoitaku@gmail.com"]
   spec.summary       = %q{UI Framework for game with DXRuby::Sprite}
@@ -20,4 +20,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.7"
   spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_dependency "quindle_ui", "~> 0.0.1"
 end
