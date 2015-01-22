@@ -1,3 +1,3 @@
-require_relative 'sprite_ui/core'
-require_relative 'sprite_ui/controllers'
-require_relative 'sprite_ui/components'
+require_relative 'quindle_sprite_ui/core'
+require_relative 'quindle_sprite_ui/controllers'
+require_relative 'quindle_sprite_ui/components'

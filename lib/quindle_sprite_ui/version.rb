@@ -1,3 +1,3 @@
-module SpriteUI
+module Quindle::SpriteUI
   VERSION = "0.0.1"
 end
