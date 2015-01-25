@@ -1,4 +1,4 @@
-class Quindle::UI::TextLabel < Quindle::SpriteUI::Base
+class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
 
   attr_reader :text, :font
   attr_accessor :color

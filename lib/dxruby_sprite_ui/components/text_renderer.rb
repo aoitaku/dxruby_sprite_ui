@@ -1,8 +1,10 @@
-module Quindle
+module Quincite
+
   Context = Struct.new(:target, :font)
+
 end
 
-module Quindle::TextRenderer
+module Quincite::TextRenderer
 
   def self.draw(x, y, drawable, context)
     text, params = *drawable.draw_params

@@ -1,4 +1,4 @@
-class Quindle::UI::TextButton < Quindle::UI::TextLabel
+class Quincite::UI::TextButton < Quincite::UI::TextLabel
 
   def draw_params
     if color

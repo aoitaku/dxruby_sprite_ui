@@ -1,12 +1,12 @@
 require 'dxruby'
 require 'quindle_ui'
 
-module Quindle
+module DXRuby
 
   module SpriteUI
 
     def self.build(&proc)
-      UI.build(Container, &proc)
+      Quincite::UI.build(Container, &proc)
     end
 
     def self.equip(mod)
@@ -15,7 +15,7 @@ module Quindle
 
     class Base < Sprite
 
-      include UI::Control
+      include Quincite::UI::Control
 
       attr_accessor :id
       attr_accessor :position, :top, :left
@@ -111,7 +111,7 @@ module Quindle
 
     class Container < Base
 
-      include UI::Container
+      include Quincite::UI::Container
 
       def initialize(*args)
         super
