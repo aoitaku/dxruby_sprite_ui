@@ -1,5 +1,5 @@
 require 'dxruby'
-require 'quindle_ui'
+require 'quincite'
 
 module DXRuby
 
