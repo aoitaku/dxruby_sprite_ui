@@ -46,7 +46,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   end
 
   def context
-    Quindle::Context[target, font]
+    Quincite::Context[target, font]
   end
 
   def draw_params
