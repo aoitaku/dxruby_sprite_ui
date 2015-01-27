@@ -19,10 +19,10 @@ gem 'dxruby_sprite_ui', :git => "https://github.com/aoitaku/dxruby_sprite_ui.git
 
 を実行する。
 
-あるいは自分で [Quincite のリリースページ](https://github.com/aoitaku/quincite/releases/tag/v0.0.1) と [DXRuby::SpriteUI のリリースページ](https://github.com/aoitaku/dxruby_sprite_ui/releases) から gem をダウンロードして、
+あるいは自分で [Quincite のリリースページ](https://github.com/aoitaku/quincite/releases) と [DXRuby::SpriteUI のリリースページ](https://github.com/aoitaku/dxruby_sprite_ui/releases) から gem をダウンロードして、
 
-    $ gem install quincite-0.0.1.gem
-    $ gem install dxruby_sprite_ui-0.0.1.gem
+    $ gem install quincite.gem
+    $ gem install dxruby_sprite_ui.gem
 
 のようにインストールしても OK。
 
