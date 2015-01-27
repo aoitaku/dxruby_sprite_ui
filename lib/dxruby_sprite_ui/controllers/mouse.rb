@@ -66,7 +66,7 @@ class DXRuby::SpriteUI::MouseEventDispatcher
     super
     @mouse = SpriteUI::Mouse.new
     @mouse_prev = SpriteUI::Mouse.new
-    @event = MouseEvent.new
+    @event = Quincite::MouseEvent.new
   end
 
   def update

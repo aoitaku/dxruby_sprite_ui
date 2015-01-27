@@ -1,31 +1,96 @@
-# SpriteUi
+# DXRuby::SpriteUI
 
-TODO: Write a gem description
+DXRuby::SpriteUI は DXRuby でゲーム向け GUI を実装するための機能を提供するライブラリです。
+[Quincite](https://github.com/aoitaku/quincite) のリファレンス実装になっています。
 
-## Installation
 
-Add this line to your application's Gemfile:
+## インストール
+
+Gemfile に
 
 ```ruby
-gem 'sprite_ui'
+gem 'quincite', :git => "https://github.com/aoitaku/quincite.git"
+gem 'dxruby_sprite_ui', :git => "https://github.com/aoitaku/dxruby_sprite_ui.git"
 ```
 
-And then execute:
+って書いてコマンドラインから
 
     $ bundle
 
-Or install it yourself as:
+を実行する。
 
-    $ gem install sprite_ui
+あるいは自分で
 
-## Usage
+    $ gem install --source http://github.com/aoitaku/quincite/raw/master/ quincite
+    $ gem install --source http://github.com/aoitaku/dxruby_sprite_ui/raw/master/ dxruby_sprite_ui
 
-TODO: Write usage instructions here
+のようにインストールしても OK。
 
-## Contributing
+今のところ Rubygems には公開していないので github からダウンロードしてお使いください。
 
-1. Fork it ( https://github.com/[my-github-username]/sprite_ui/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+DXRuby 用のライブラリのため、別途 DXRuby をインストールする必要があります。
+
+
+## 使い方
+
+### サンプルコード
+
+#### ビルダー DSL
+
+```ruby
+require 'dxruby'
+require 'dxruby_sprite_ui'
+
+ui = SpriteUI::build {
+  TextLabel {
+    text 'Hello, world.'
+  }
+}
+ui.layout
+
+Window.loop do
+  ui.draw
+end
+```
+
+#### イベントハンドラ
+
+```ruby
+require 'dxruby'
+require 'dxruby_sprite_ui'
+
+SpriteUI.equip Quincite::MouseEventHandler
+
+ui = SpriteUI::build {
+  TextButton {
+    text 'Hello, world!'
+    hello = true
+    add_event_handler :mouse_left_push, -> target {
+      target.text = hello ? 'Goodbye, world...' : 'Hello again, world!'
+      hello = !hello
+      ui.layout
+    }
+  }
+}
+ui.layout
+
+mouse_event_dispatcher = SpriteUI::MouseEventDispatcher.new(ui)
+
+Window.loop do
+  mouse_event_dispatcher.update
+  mouse_event_dispatcher.dispatch
+  ui.draw
+end
+```
+
+
+
+
+## コントリビューション
+
+1. フォークします ( https://github.com/aoitaku/dxruby_sprite_ui/fork )
+2. feature branch を作ります (`git checkout -b my-new-feature`)
+3. 変更をコミットします (`git commit -am 'Add some feature'`)
+4. branch に push します (`git push origin my-new-feature`)
+5. pull request を投げます
+6. 🍣！
