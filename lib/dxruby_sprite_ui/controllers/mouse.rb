@@ -4,7 +4,7 @@ class DXRuby::SpriteUI::Mouse < Sprite
 
   attr_reader :hover, :prev
 
-  def initialize()
+  def initialize
     @hover = nil
     self.collision = [0,0]
   end
@@ -92,12 +92,12 @@ class DXRuby::SpriteUI::MouseEventDispatcher
   end
 
   def dispatch
-    target = event_listener.all(:desc).find(&:===.(mouse))
+    target = event_listener.all(:desc).find {|target| target === mouse }
     unless mouse.left_down?
       mouse_prev.hover = mouse.hover
       mouse.hover = target and WeakRef.new(target)
     end
-    event_listener.all(:desc).select(&:===.(mouse)).tap do |targets|
+    event_listener.all(:desc).select {|target| target === mouse }.tap do |targets|
       if mouse.left_push?
         targets.any? do |current_target|
           event.fire(:mouse_left_push, target, current_target)
@@ -146,7 +146,7 @@ class DXRuby::SpriteUI::MouseEventDispatcher
         end
       end
       if mouse_hover_change?
-        event_listener.all(:desc).select(&:===.(mouse_prev.hover)).any? do |current_target|
+        event_listener.all(:desc).select {|target| target === mouse_prev.hover }.any? do |current_target|
           event.fire(:mouse_out, current_target, mouse_prev.hover, [mouse_prev.hover, mouse.hover])
         end
       end

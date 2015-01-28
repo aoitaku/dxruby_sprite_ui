@@ -10,7 +10,7 @@ module DXRuby
     end
 
     def self.equip(mod)
-      Base.__send__ :include, mod
+      Base.__send__ :include, Quincite.const_get(mod)
     end
 
     class Base < Sprite

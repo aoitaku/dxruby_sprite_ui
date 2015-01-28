@@ -84,8 +84,6 @@ end
 ```
 
 
-
-
 ## コントリビューション
 
 1. フォークします ( https://github.com/aoitaku/dxruby_sprite_ui/fork )
