@@ -1,7 +1,7 @@
 class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
 
   attr_reader :text, :font
-  attr_accessor :color
+  attr_accessor :aa, :color, :text_edge, :text_shadow
 
   def initialize(id='', text='', x=0, y=0, *argv)
     super(id, x, y)
@@ -50,11 +50,29 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   end
 
   def draw_params
-    if color
-      [text, {color: color}]
-    else
-      [text, {}]
+    param = {}
+    if text_edge
+      param[:edge] = true
+      if Hash === text_edge
+        param[:edge_color] = text_edge[:color] if text_edge[:color]
+        param[:edge_width] = text_edge[:width] if text_edge[:width]
+        param[:edge_level] = text_edge[:level] if text_edge[:level]
+      end
     end
+    if text_shadow
+      param[:shadow] = true
+      if Hash === text_shadow
+        param[:shadow_edge] = text_shadow[:edge] if text_shadow[:edge]
+        param[:shadow_color] = text_shadow[:color] if text_shadow[:color]
+        param[:shadow_x] = text_shadow[:x] if text_shadow[:x]
+        param[:shadow_y] = text_shadow[:y] if text_shadow[:y]
+      end
+    end
+    if color
+      param[:color] = color
+    end
+    param[:aa] = aa || text_edge || text_shadow
+    [text, param]
   end
 
 end

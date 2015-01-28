@@ -1,11 +1,16 @@
 class Quincite::UI::TextButton < Quincite::UI::TextLabel
 
-  def draw_params
-    if color
-      [text, {color: color}]
-    else
-      [text, {}]
-    end
+  attr_accessor :disable_color, :active_color, :hover_color
+
+  def initialize(id='', text='', x=0, y=0, *argv)
+    super(id, text, x, y)
+    @disable_color = [255,127,127,127]
+    @active_color = [255,127,255,223]
+    @hover_color = [255,255,223,127]
+  end
+
+  def onclick=(event_handler=Proc.new)
+    add_event_handler(:mouse_left_push, event_handler)
   end
 
   def disable?
@@ -22,11 +27,11 @@ class Quincite::UI::TextButton < Quincite::UI::TextLabel
 
   def color
     if disable?
-      @color or [255,127,127,127]
+      @color or @disable_color
     elsif active?
-      [255,127,255,223]
+      @active_color
     elsif hover?
-      [255,255,223,127]
+      @hover_color
     else
       @color
     end
