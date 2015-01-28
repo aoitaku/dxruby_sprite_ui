@@ -32,6 +32,8 @@ module DXRuby
         self.visible = true
         self.top = 0
         self.left = 0
+        self.margin = 0
+        self.padding = 0
         init_control
       end
 
