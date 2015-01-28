@@ -22,7 +22,7 @@ module DXRuby
 
       attr_accessor :id
       attr_accessor :position, :top, :left
-      attr_accessor :margin, 
+      attr_accessor :margin, :padding
       attr_writer :width, :height, :visible
 
       def initialize(id='', *args)
