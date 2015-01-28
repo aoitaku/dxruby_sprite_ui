@@ -56,111 +56,115 @@ class DXRuby::SpriteUI::Mouse < Sprite
 
 end
 
-class DXRuby::SpriteUI::MouseEventDispatcher
+module DXRuby::SpriteUI
 
-  include Quincite::UI::EventDispatcher
+  class MouseEventDispatcher
 
-  attr_reader :mouse, :mouse_prev
+    include SpriteUI
+    include UI::EventDispatcher
 
-  def initialize(event_listener)
-    super
-    @mouse = SpriteUI::Mouse.new
-    @mouse_prev = SpriteUI::Mouse.new
-    @event = Quincite::MouseEvent.new
-  end
+    attr_reader :mouse, :mouse_prev
 
-  def update
-    mouse_prev.x = mouse.x
-    mouse_prev.y = mouse.y
-    mouse.update
-  end
-
-  def mouse_move_from
-    [mouse_prev.x, mouse_prev.y]
-  end
-
-  def mouse_move_to
-    [mouse.x, mouse.y]
-  end
-
-  def mouse_move?
-    mouse_move_from == mouse_move_to
-  end
-
-  def mouse_hover_change?
-    not(mouse.left_down? or mouse.hover == mouse_prev.hover)
-  end
-
-  def dispatch
-    target = event_listener.all(:desc).find {|target| target === mouse }
-    unless mouse.left_down?
-      mouse_prev.hover = mouse.hover
-      mouse.hover = target and WeakRef.new(target)
+    def initialize(event_listener)
+      super
+      @mouse = Mouse.new
+      @mouse_prev = Mouse.new
+      @event = MouseEvent.new
     end
-    event_listener.all(:desc).select {|target| target === mouse }.tap do |targets|
-      if mouse.left_push?
-        targets.any? do |current_target|
-          event.fire(:mouse_left_push, target, current_target)
-        end
+
+    def update
+      mouse_prev.x = mouse.x
+      mouse_prev.y = mouse.y
+      mouse.update
+    end
+
+    def mouse_move_from
+      [mouse_prev.x, mouse_prev.y]
+    end
+
+    def mouse_move_to
+      [mouse.x, mouse.y]
+    end
+
+    def mouse_move?
+      mouse_move_from == mouse_move_to
+    end
+
+    def mouse_hover_change?
+      not(mouse.left_down? or mouse.hover == mouse_prev.hover)
+    end
+
+    def dispatch
+      target = event_listener.all(:desc).find {|target| target === mouse }
+      unless mouse.left_down?
+        mouse_prev.hover = mouse.hover
+        mouse.hover = target and WeakRef.new(target)
       end
-      if mouse.right_push?
-        targets.any? do |current_target|
-          event.fire(:mouse_right_push, target, current_target)
+      event_listener.all(:desc).select {|target| target === mouse }.tap do |targets|
+        if mouse.left_push?
+          targets.any? do |current_target|
+            event.fire(:mouse_left_push, target, current_target)
+          end
         end
-      end
-      if mouse.middle_push?
-        targets.any? do |current_target|
-          event.fire(:mouse_middle_push, current_target, target)
+        if mouse.right_push?
+          targets.any? do |current_target|
+            event.fire(:mouse_right_push, target, current_target)
+          end
         end
-      end
-      if mouse.left_down?
-        mouse.hover.activate if mouse.hover
-        targets.any? do |current_target|
-          event.fire(:mouse_left_down, current_target, target)
+        if mouse.middle_push?
+          targets.any? do |current_target|
+            event.fire(:mouse_middle_push, current_target, target)
+          end
         end
-      end
-      if mouse.right_down?
-        targets.any? do |current_target|
-          event.fire(:mouse_right_down, current_target, target)
+        if mouse.left_down?
+          mouse.hover.activate if mouse.hover
+          targets.any? do |current_target|
+            event.fire(:mouse_left_down, current_target, target)
+          end
         end
-      end
-      if mouse.middle_down?
-        targets.any? do |current_target|
-          event.fire(:mouse_middle_down, current_target, target)
+        if mouse.right_down?
+          targets.any? do |current_target|
+            event.fire(:mouse_right_down, current_target, target)
+          end
         end
-      end
-      if mouse.left_release?
-        mouse_prev.hover.deactivate if mouse_prev.hover
-        targets.any? do |current_target|
-          event.fire(:mouse_left_release, current_target, target)
+        if mouse.middle_down?
+          targets.any? do |current_target|
+            event.fire(:mouse_middle_down, current_target, target)
+          end
         end
-      end
-      if mouse.right_release?
-        targets.any? do |current_target|
-          event.fire(:mouse_right_release, current_target, target)
+        if mouse.left_release?
+          mouse_prev.hover.deactivate if mouse_prev.hover
+          targets.any? do |current_target|
+            event.fire(:mouse_left_release, current_target, target)
+          end
         end
-      end
-      if mouse.middle_release?
-        targets.any? do |current_target|
-          event.fire(:mouse_middle_release, current_target, target)
+        if mouse.right_release?
+          targets.any? do |current_target|
+            event.fire(:mouse_right_release, current_target, target)
+          end
         end
-      end
-      if mouse_hover_change?
-        event_listener.all(:desc).select {|target| target === mouse_prev.hover }.any? do |current_target|
-          event.fire(:mouse_out, current_target, mouse_prev.hover, [mouse_prev.hover, mouse.hover])
+        if mouse.middle_release?
+          targets.any? do |current_target|
+            event.fire(:mouse_middle_release, current_target, target)
+          end
         end
-      end
-      if mouse_move?
-        targets.any? do |current_target|
-          event.fire(:mouse_move, current_target, target, [mouse_move_from, mouse_move_to])
+        if mouse_hover_change?
+          event_listener.all(:desc).select {|target| target === mouse_prev.hover }.any? do |current_target|
+            event.fire(:mouse_out, current_target, mouse_prev.hover, [mouse_prev.hover, mouse.hover])
+          end
         end
-      end
-      if mouse_hover_change?
-        targets.any? do |current_target|
-          event.fire(:mouse_over, current_target, mouse.hover, [mouse_prev.hover, mouse.hover])
+        if mouse_move?
+          targets.any? do |current_target|
+            event.fire(:mouse_move, current_target, target, [mouse_move_from, mouse_move_to])
+          end
+        end
+        if mouse_hover_change?
+          targets.any? do |current_target|
+            event.fire(:mouse_over, current_target, mouse.hover, [mouse_prev.hover, mouse.hover])
+          end
         end
       end
     end
-  end
 
+  end
 end

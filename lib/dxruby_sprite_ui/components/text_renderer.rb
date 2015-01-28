@@ -1,10 +1,10 @@
-module Quincite
+module DXRuby::SpriteUI
 
   Context = Struct.new(:target, :font)
 
 end
 
-module Quincite::TextRenderer
+module DXRuby::SpriteUI::TextRenderer
 
   def self.draw(x, y, drawable, context)
     text, params = *drawable.draw_params

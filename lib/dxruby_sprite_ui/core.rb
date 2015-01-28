@@ -5,17 +5,20 @@ module DXRuby
 
   module SpriteUI
 
+    include Quincite
+
     def self.build(&proc)
-      Quincite::UI.build(Container, &proc)
+      UI.build(Container, &proc)
     end
 
     def self.equip(mod)
-      Base.__send__ :include, Quincite.const_get(mod)
+      Base.__send__(:include, const_get(mod))
     end
 
     class Base < Sprite
 
-      include Quincite::UI::Control
+      include SpriteUI
+      include UI::Control
 
       attr_accessor :id
       attr_accessor :position, :top, :left
@@ -111,7 +114,7 @@ module DXRuby
 
     class Container < Base
 
-      include Quincite::UI::Container
+      include UI::Container
 
       def initialize(*args)
         super

@@ -26,7 +26,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
 
   def draw
     super
-    Quincite::TextRenderer.draw(x, y, self, context) if visible?
+    TextRenderer.draw(x, y, self, context) if visible?
   end
 
   def content_width
@@ -46,7 +46,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   end
 
   def context
-    Quincite::Context[target, font]
+    Context[target, font]
   end
 
   def draw_params

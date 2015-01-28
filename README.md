@@ -59,7 +59,7 @@ end
 require 'dxruby'
 require 'dxruby_sprite_ui'
 
-SpriteUI.equip Quincite::MouseEventHandler
+SpriteUI.equip :MouseEventHandler
 
 ui = SpriteUI::build {
   TextButton {
