@@ -23,6 +23,7 @@ module DXRuby
       attr_accessor :id
       attr_accessor :position, :top, :left
       attr_accessor :margin, :padding
+
       attr_writer :width, :height, :visible
 
       def initialize(id='', *args)
@@ -106,11 +107,18 @@ module DXRuby
       def update
       end
 
-      def layout(ox=0, oy=0, &block)
+      def layout(ox=0, oy=0)
+        resize
+        move(ox, oy)
+        self.collision = [0, 0, width, height]
+      end
+
+      def move(ox=0, oy=0)
         self.x = ox + left
         self.y = oy + top
-        yield if block_given?
-        self.collision = [0, 0, width, height]
+      end
+
+      def resize
       end
 
     end
@@ -119,9 +127,12 @@ module DXRuby
 
       include UI::Container
 
+      attr_writer :layout
+
       def initialize(*args)
         super
         init_container
+        self.layout = :vertical_box
       end
 
       def draw
@@ -134,22 +145,98 @@ module DXRuby
         components.each(&:update)
       end
 
-      def layout(ox=0, oy=0)
-        super(ox, oy) do
-          height = components.inject(0) do |height, component|
-            component.layout(self.x, self.y + height)
-            height + component.layout_height
-          end
-          if @height.nil? and (image.nil? or image.height.zero?)
-            @computed_height = height
-          end
-          if @width.nil? and (image.nil? or image.width.zero?)
-            @computed_width = components.inject(0) do |width, component|
-              [width, component.layout_width].max
-            end
-          end
-        end
+      def resize
+        super
+        method(:"#{@layout}_resize").()
       end
+
+      def move(ox=0, oy=0)
+        super
+        method(:"#{@layout}_move").()
+      end
+
+      def flow_resize
+        max_width = (@width or (image and image.width) or Window.width)
+        width = 0
+        @computed_width = max_width
+        @computed_height = components.slice_before {|component|
+          component.resize
+          if width > 0 and width + component.layout_width > max_width
+            width = component.layout_width
+            true
+          else
+            width += component.layout_width
+            false
+          end
+        }.inject(0) {|height, row|
+          height + row.max_by(&:layout_height).layout_height
+        }
+      end
+
+      def flow_move
+        max_width = (@width or (image and image.width) or Window.width)
+        width = 0
+        components.slice_before {|component|
+          if width > 0 and width + component.layout_width > max_width
+            width = component.layout_width
+            true
+          else
+            width += component.layout_width
+            false
+          end
+        }.inject(0) {|height, row|
+          max_height = row.max_by(&:layout_height).layout_height
+          row.inject(0) {|width, component|
+            component.move(self.x + width, self.y + height + (max_height - component.layout_height) / 2)
+            width + component.layout_width
+          }
+          height + max_height
+        }
+      end
+
+      def vertical_box_resize
+        width = 0
+        @computed_height = components.inject(0) {|height, component|
+          component.resize
+          width = component.layout_width if width < component.layout_width
+          height + component.layout_height
+        }
+        @computed_width = width
+      end
+
+      def vertical_box_move
+        components.inject(0) {|height, component|
+          component.move(self.x, self.y + height)
+          height + component.layout_height
+        }
+      end
+
+      def horizontal_box_resize
+        height = 0
+        @computed_width = components.inject(0) {|width, component|
+          component.resize
+          height = component.layout_height if height < component.layout_height
+          width + component.layout_width
+        }
+        @computed_height = height
+      end
+
+      def horizontal_box_move
+        components.inject(0) {|width, component|
+          component.move(self.x + width, self.y)
+          width + component.layout_width
+        }
+      end
+
+      def variable_width?
+        @width.nil? and (image.nil? or image.width.zero?)
+      end
+      private :variable_width?
+
+      def variable_height?
+        @height.nil? and (image.nil? or image.height.zero?)
+      end
+      private :variable_height?
 
     end
   end
