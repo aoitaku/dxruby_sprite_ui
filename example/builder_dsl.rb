@@ -1,4 +1,5 @@
 require 'dxruby_sprite_ui'
+Font.default = Font.new(22)
 
 ui = SpriteUI::build {
   TextLabel {

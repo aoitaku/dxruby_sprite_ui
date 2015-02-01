@@ -1,5 +1,5 @@
-require 'dxruby'
 require 'dxruby_sprite_ui'
+Font.default = Font.new(22)
 
 SpriteUI.equip :MouseEventHandler
 
