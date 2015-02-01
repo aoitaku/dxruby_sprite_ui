@@ -65,7 +65,7 @@ ui = SpriteUI::build {
   TextButton {
     text 'Hello, world!'
     hello = true
-    add_event_handler :mouse_left_push, -> target {
+    onclick -> target {
       target.text = hello ? 'Goodbye, world...' : 'Hello again, world!'
       hello = !hello
       ui.layout
@@ -83,6 +83,7 @@ Window.loop do
 end
 ```
 
+ほか、example 内のサンプルを参照してください。
 
 ## コントリビューション
 
