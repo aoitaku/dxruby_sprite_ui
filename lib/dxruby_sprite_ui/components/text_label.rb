@@ -33,7 +33,9 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     if text.empty?
       super
     else
-      font.get_width(text)
+      text.each_line.map {|line|
+        font.get_width(line)
+      }.max + padding * 2
     end
   end
 
@@ -41,7 +43,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     if text.empty?
       super
     else
-      font.size
+      font.size * (text.each_line.to_a.size) + padding * 2
     end
   end
 
