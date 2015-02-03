@@ -35,6 +35,8 @@ module DXRuby
         self.left = 0
         self.margin = 0
         self.padding = 0
+        @border = nil
+        @bg = nil
         init_control
       end
 
@@ -46,7 +48,7 @@ module DXRuby
         if @width
           @width
         elsif @computed_width
-          @computed_width
+          @computed_width + padding * 2
         else
           content_width
         end
@@ -64,7 +66,7 @@ module DXRuby
         if @height
           @height
         elsif @computed_height
-          @computed_height
+          @computed_height + padding * 2
         else
           content_height
         end
@@ -97,11 +99,30 @@ module DXRuby
       end
 
       def draw
-        draw_image(x, y, image) if visible?
+        if visible?
+          draw_bg if @bg
+          draw_image(x + padding, y + padding) if image
+          draw_border if @border
+        end
       end
 
-      def draw_image(x, y, image)
-        (target or Window).draw(x, y, image) if image
+      def draw_bg
+        draw_scaled_image(x, y, @bg, scale_x: width, scale_y: height)
+      end
+
+      def draw_border
+        draw_scaled_image(x, y, @border, scale_x: width-1)
+        draw_scaled_image(x, y + 1, @border, scale_y: height-1)
+        draw_scaled_image(x + 1, y + height - 1, @border, scale_x: width-1)
+        draw_scaled_image(x + width - 1, y, @border, scale_y: height-1)
+      end
+
+      def draw_image(x, y)
+        (target or Window).draw(x, y, image)
+      end
+
+      def draw_scaled_image(x, y, image, scale_x: 1, scale_y: 1)
+        (target or Window).draw_scale(x, y, image, scale_x, scale_y, 0, 0)
       end
 
       def update
@@ -109,13 +130,13 @@ module DXRuby
 
       def layout(ox=0, oy=0)
         resize
-        move(ox, oy)
+        move(ox + left, oy + top)
         self.collision = [0, 0, width, height]
       end
 
-      def move(ox=0, oy=0)
-        self.x = ox + left
-        self.y = oy + top
+      def move(to_x, to_y)
+        self.x = to_x
+        self.y = to_y
       end
 
       def resize
@@ -156,7 +177,7 @@ module DXRuby
       end
 
       def flow_resize
-        max_width = (@width or (image and image.width) or Window.width)
+        max_width = (@width or (image and image.width) or Window.width) - padding * 2
         width = 0
         @computed_width = max_width
         @computed_height = components.slice_before {|component|
@@ -174,7 +195,7 @@ module DXRuby
       end
 
       def flow_move
-        max_width = (@width or (image and image.width) or Window.width)
+        max_width = (@width or (image and image.width) or Window.width) - padding * 2
         width = 0
         components.slice_before {|component|
           if width > 0 and width + component.layout_width > max_width
@@ -187,7 +208,10 @@ module DXRuby
         }.inject(0) {|height, row|
           max_height = row.max_by(&:layout_height).layout_height
           row.inject(0) {|width, component|
-            component.move(self.x + width, self.y + height + (max_height - component.layout_height) / 2)
+            component.move(
+              self.x + padding + width,
+              self.y + padding + height + (max_height - component.layout_height) / 2
+            )
             width + component.layout_width
           }
           height + max_height
@@ -206,7 +230,9 @@ module DXRuby
 
       def vertical_box_move
         components.inject(0) {|height, component|
-          component.move(self.x, self.y + height)
+          component.move(
+            self.x + padding, self.y + padding + height
+          )
           height + component.layout_height
         }
       end
@@ -223,7 +249,10 @@ module DXRuby
 
       def horizontal_box_move
         components.inject(0) {|width, component|
-          component.move(self.x + width, self.y)
+          component.move(
+            self.x + padding + width,
+            self.y + (self.height - component.layout_height) / 2
+          )
           width + component.layout_width
         }
       end
