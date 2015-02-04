@@ -15,6 +15,27 @@ module DXRuby
       Base.__send__(:include, const_get(mod))
     end
 
+    module ColorUtils
+
+      def self.make_color(color)
+        case color
+        when Array
+          color
+        when Fixnum
+          [color >> 16 & 0xff,
+           color >> 8 & 0xff,
+           color & 0xff]
+        when /^#[0-9a-fA-F]{6}$/
+          [color[1..2].hex,
+           color[3..4].hex,
+           color[5..6].hex]
+        else
+          nil
+        end
+      end
+
+    end
+
     class Base < Sprite
 
       include SpriteUI
@@ -38,6 +59,26 @@ module DXRuby
         @border = nil
         @bg = nil
         init_control
+      end
+
+      def bgcolor=(bgcolor)
+        bgcolor = ColorUtils.make_color(bgcolor)
+        if bgcolor
+          @bg = Image.new(1, 1, bgcolor)
+        else
+          @bg = nil
+        end
+      end
+
+      def border=(border)
+        case border
+        when Hash
+          @border_width = border[:width] || 1
+          @border_color = ColorUtils.make_color(border[:color]) || [255, 255, 255]
+        else
+          @border_width = nil
+          @border_color = nil
+        end
       end
 
       def visible?
@@ -102,7 +143,7 @@ module DXRuby
         if visible?
           draw_bg if @bg
           draw_image(x + padding, y + padding) if image
-          draw_border if @border
+          draw_border if @border_width and @border_color
         end
       end
 
@@ -111,14 +152,44 @@ module DXRuby
       end
 
       def draw_border
-        draw_scaled_image(x, y, @border, scale_x: width-1)
-        draw_scaled_image(x, y + 1, @border, scale_y: height-1)
-        draw_scaled_image(x + 1, y + height - 1, @border, scale_x: width-1)
-        draw_scaled_image(x + width - 1, y, @border, scale_y: height-1)
+        draw_line(x,
+                  y,
+                  x + width - @border_width,
+                  y,
+                  @border_width,
+                  @border_color
+        )
+        draw_line(x,
+                  y + @border_width,
+                  x,
+                  y + height - @border_width,
+                  @border_width,
+                  @border_color
+        )
+        draw_line(x + @border_width,
+                  y + height - @border_width,
+                  x + width - @border_width,
+                  y + height - @border_width,
+                  @border_width,
+                  @border_color)
+        draw_line(x + width - @border_width,
+                  y,
+                  x + width - @border_width,
+                  y + height - @border_width,
+                  @border_width,
+                  @border_color)
       end
 
       def draw_image(x, y)
         (target or Window).draw(x, y, image)
+      end
+
+      def draw_line(x0, y0, x1, y1, width, color)
+        if width == 1
+          (target or Window).draw_line(x0, y0, x1 + width - 1, y1 + width - 1, color)
+        else
+          (target or Window).draw_box_fill(x0, y0, x1 + width - 1, y1 + width - 1, color)
+        end
       end
 
       def draw_scaled_image(x, y, image, scale_x: 1, scale_y: 1)
