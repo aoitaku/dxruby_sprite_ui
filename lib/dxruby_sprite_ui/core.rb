@@ -43,9 +43,10 @@ module DXRuby
 
       attr_accessor :id
       attr_accessor :position, :top, :left
-      attr_accessor :margin, :padding
+      attr_accessor :padding
 
-      attr_writer :width, :height, :visible
+      attr_writer :width, :height, :margin
+      attr_writer :visible
 
       def initialize(id='', *args)
         super(0, 0)
@@ -89,7 +90,7 @@ module DXRuby
         if @width
           @width
         elsif @computed_width
-          @computed_width + padding * 2
+          @computed_width # + padding * 2
         else
           content_width
         end
@@ -107,7 +108,7 @@ module DXRuby
         if @height
           @height
         elsif @computed_height
-          @computed_height + padding * 2
+          @computed_height # + padding * 2
         else
           content_height
         end
@@ -126,7 +127,7 @@ module DXRuby
         when :absolute
           0
         else
-          width
+          width + margin * 2
         end
       end
 
@@ -135,7 +136,16 @@ module DXRuby
         when :absolute
           0
         else
-          height
+          height + margin * 2
+        end
+      end
+
+      def margin
+        case position
+        when :absolute
+          0
+        else
+          @margin
         end
       end
 
@@ -157,15 +167,13 @@ module DXRuby
                   x + width - @border_width,
                   y,
                   @border_width,
-                  @border_color
-        )
+                  @border_color)
         draw_line(x,
                   y + @border_width,
                   x,
                   y + height - @border_width,
                   @border_width,
-                  @border_color
-        )
+                  @border_color)
         draw_line(x + @border_width,
                   y + height - @border_width,
                   x + width - @border_width,
@@ -201,13 +209,13 @@ module DXRuby
 
       def layout(ox=0, oy=0)
         resize
-        move(ox + left, oy + top)
+        move(ox, oy)
         self.collision = [0, 0, width, height]
       end
 
       def move(to_x, to_y)
-        self.x = to_x
-        self.y = to_y
+        self.x = to_x + left
+        self.y = to_y + top
       end
 
       def resize
@@ -248,83 +256,164 @@ module DXRuby
       end
 
       def flow_resize
-        max_width = (@width or (image and image.width) or Window.width) - padding * 2
+        max_width = (@width or (image and image.width) or Window.width)
         width = 0
+        adjacent_vertical_space = padding
+        adjacent_horizontal_space = padding
         @computed_width = max_width
         @computed_height = components.slice_before {|component|
+          horizontal_space = [adjacent_horizontal_space, component.margin].max
           component.resize
-          if width > 0 and width + component.layout_width > max_width
-            width = component.layout_width
-            true
-          else
-            width += component.layout_width
+          if (component.position == :absolute)
             false
+          else
+            if width > 0 and width + component.layout_width > max_width - padding * 2
+              width = horizontal_space + component.layout_width - component.margin * 2
+              adjacent_horizontal_space = padding
+              true
+            else
+              width += horizontal_space + component.layout_width - component.margin * 2
+              adjacent_horizontal_space = component.margin
+              false
+            end
           end
         }.inject(0) {|height, row|
-          height + row.max_by(&:layout_height).layout_height
-        }
+          component = row.max_by(&:layout_height)
+          vertical_space = [adjacent_vertical_space, component.margin].max
+          if component.position == :absolute
+            height
+          else
+            adjacent_vertical_space = component.margin
+            height + vertical_space + component.layout_height - component.margin * 2
+          end
+        } + [adjacent_vertical_space, padding].max
       end
 
       def flow_move
-        max_width = (@width or (image and image.width) or Window.width) - padding * 2
+        max_width = (@width or (image and image.width) or Window.width)
         width = 0
+        adjacent_vertical_space = padding
+        adjacent_horizontal_space = padding
         components.slice_before {|component|
-          if width > 0 and width + component.layout_width > max_width
-            width = component.layout_width
-            true
-          else
-            width += component.layout_width
+          horizontal_space = [adjacent_horizontal_space, component.margin].max
+          if (component.position == :absolute)
             false
+          else
+            if width > 0 and width + component.layout_width > max_width - padding * 2
+              width = horizontal_space + component.layout_width - component.margin * 2
+              adjacent_horizontal_space = padding
+              true
+            else
+              width += horizontal_space + component.layout_width - component.margin * 2
+              adjacent_horizontal_space = component.margin
+              false
+            end
           end
         }.inject(0) {|height, row|
-          max_height = row.max_by(&:layout_height).layout_height
+          component = row.max_by(&:layout_height)
+          max_height = component.layout_height
+          vertical_space = [adjacent_vertical_space, component.margin].max
+          adjacent_vertical_space = component.margin
+          adjacent_horizontal_space = padding
           row.inject(0) {|width, component|
-            component.move(
-              self.x + padding + width,
-              self.y + padding + height + (max_height - component.layout_height) / 2
-            )
-            width + component.layout_width
+            horizontal_space = [adjacent_horizontal_space, component.margin].max
+            if component.position == :absolute
+              component.move(
+                self.x + horizontal_space + width,
+                self.y + vertical_space - adjacent_vertical_space + height + (max_height - component.height) / 2
+              )
+              width
+            else
+              component.move(
+                self.x + horizontal_space + width,
+                self.y + vertical_space + height + (max_height - component.layout_height) / 2
+              )
+              adjacent_horizontal_space = component.margin
+              width + horizontal_space + component.layout_width - component.margin * 2
+            end
           }
-          height + max_height
+          height + vertical_space + max_height - component.margin * 2
         }
       end
 
       def vertical_box_resize
         width = 0
+        adjacent_space = padding
+        horizontal_space = 0
         @computed_height = components.inject(0) {|height, component|
+          vertical_space = [adjacent_space, component.margin].max
           component.resize
-          width = component.layout_width if width < component.layout_width
-          height + component.layout_height
-        }
-        @computed_width = width
+          if width < component.layout_width
+            width = component.layout_width
+            horizontal_space = component.margin
+          end
+          if component.position == :absolute
+            height
+          else
+            adjacent_space = component.margin 
+            height + vertical_space + component.layout_height - component.margin * 2
+          end
+        } + [adjacent_space, padding].max
+        @computed_width = width - horizontal_space * 2 + [horizontal_space, padding].max * 2
       end
 
       def vertical_box_move
+        adjacent_space = padding
         components.inject(0) {|height, component|
+          vertical_space = [adjacent_space, component.margin].max
           component.move(
-            self.x + padding, self.y + padding + height
+            self.x + [padding, component.margin].max,
+            self.y + vertical_space + height
           )
-          height + component.layout_height
+          if component.position == :absolute
+            height
+          else
+            adjacent_space = component.margin 
+            height + vertical_space + component.layout_height - component.margin * 2
+          end
         }
       end
 
       def horizontal_box_resize
         height = 0
+        adjacent_space = padding
+        vertical_space = 0
         @computed_width = components.inject(0) {|width, component|
+          horizontal_space = [adjacent_space, component.margin].max
           component.resize
-          height = component.layout_height if height < component.layout_height
-          width + component.layout_width
-        }
-        @computed_height = height
+          if height < component.layout_height
+            height = component.layout_height
+            vertical_space = component.margin
+          end
+          if component.position == :absolute
+            width
+          else
+            adjacent_space = component.margin
+            width + horizontal_space + component.layout_width - component.margin * 2
+          end
+        } + [adjacent_space, padding].max
+        @computed_height = height - vertical_space + [vertical_space, padding].max * 2
       end
 
       def horizontal_box_move
+        adjacent_space = padding
         components.inject(0) {|width, component|
-          component.move(
-            self.x + padding + width,
-            self.y + (self.height - component.layout_height) / 2
-          )
-          width + component.layout_width
+          horizontal_space = [adjacent_space, component.margin].max
+          vertical_space = [padding, component.margin].max
+          if component.position == :absolute
+            component.move(
+              self.x + horizontal_space + width,
+              self.y + (self.height - component.height) / 2
+            )
+            width
+          else
+            component.move(
+              self.x + horizontal_space + width,
+              self.y + (self.height - component.layout_height - vertical_space) / 2 + vertical_space
+            )
+            adjacent_space = component.margin
+            width + horizontal_space + component.layout_width - component.margin * 2
+          end
         }
       end
 
