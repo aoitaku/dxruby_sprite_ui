@@ -57,6 +57,7 @@ module DXRuby
         self.left = 0
         self.margin = 0
         self.padding = 0
+        self.collision = [0,0]
         @border = nil
         @bg = nil
         init_control
@@ -210,7 +211,6 @@ module DXRuby
       def layout(ox=0, oy=0)
         resize
         move(ox, oy)
-        self.collision = [0, 0, width, height]
       end
 
       def move(to_x, to_y)
@@ -219,6 +219,7 @@ module DXRuby
       end
 
       def resize
+        self.collision = [0, 0, width, height]
       end
 
     end
