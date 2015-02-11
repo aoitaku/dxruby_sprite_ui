@@ -261,28 +261,9 @@ module DXRuby
       end
 
       def flow_resize
-        max_width = (@style.width or (image and image.width) or Window.width)
-        width = 0
         adjacent_vertical_space = padding
-        adjacent_horizontal_space = padding
-        @computed_width = max_width
-        @computed_height = components.slice_before {|component|
-          horizontal_space = [adjacent_horizontal_space, component.margin].max
-          component.resize
-          if (component.position == :absolute)
-            false
-          else
-            if width > 0 and width + component.layout_width > max_width - padding * 2
-              width = horizontal_space + component.layout_width - component.margin * 2
-              adjacent_horizontal_space = padding
-              true
-            else
-              width += horizontal_space + component.layout_width - component.margin * 2
-              adjacent_horizontal_space = component.margin
-              false
-            end
-          end
-        }.inject(0) {|height, row|
+        @computed_width = (@style.width or (image and image.width) or Window.width)
+        @computed_height = flow_slice(true).inject(0) {|height, row|
           component = row.max_by(&:layout_height)
           vertical_space = [adjacent_vertical_space, component.margin].max
           if component.position == :absolute
@@ -295,26 +276,8 @@ module DXRuby
       end
 
       def flow_move
-        max_width = (@style.width or (image and image.width) or Window.width)
-        width = 0
         adjacent_vertical_space = padding
-        adjacent_horizontal_space = padding
-        components.slice_before {|component|
-          horizontal_space = [adjacent_horizontal_space, component.margin].max
-          if (component.position == :absolute)
-            false
-          else
-            if width > 0 and width + component.layout_width > max_width - padding * 2
-              width = horizontal_space + component.layout_width - component.margin * 2
-              adjacent_horizontal_space = padding
-              true
-            else
-              width += horizontal_space + component.layout_width - component.margin * 2
-              adjacent_horizontal_space = component.margin
-              false
-            end
-          end
-        }.inject(0) {|height, row|
+        flow_slice.inject(0) {|height, row|
           component = row.max_by(&:layout_height)
           max_height = component.layout_height
           vertical_space = [adjacent_vertical_space, component.margin].max
@@ -338,6 +301,29 @@ module DXRuby
             end
           }
           height + vertical_space + max_height - component.margin * 2
+        }
+      end
+
+      def flow_slice(with_resize=false)
+        max_width = (@style.width or (image and image.width) or Window.width)
+        width = 0
+        adjacent_space = padding
+        components.slice_before {|component|
+          space = [adjacent_space, component.margin].max
+          component.resize if with_resize
+          if (component.position == :absolute)
+            false
+          else
+            if width > 0 and width + component.layout_width > max_width - padding * 2
+              width = space + component.layout_width - component.margin * 2
+              adjacent_space = padding
+              true
+            else
+              width += space + component.layout_width - component.margin * 2
+              adjacent_space = component.margin
+              false
+            end
+          end
         }
       end
 
@@ -421,16 +407,6 @@ module DXRuby
           end
         }
       end
-
-      def variable_width?
-        @style.width.nil? and (image.nil? or image.width.zero?)
-      end
-      private :variable_width?
-
-      def variable_height?
-        @style.height.nil? and (image.nil? or image.height.zero?)
-      end
-      private :variable_height?
 
     end
   end
