@@ -183,34 +183,11 @@ module DXRuby
       end
 
       def draw_bg
-        draw_scaled_image(x, y, @style.bg, scale_x: width, scale_y: height)
+        (target or Window).draw_scale(x, y, @style.bg, width, height, 0, 0)
       end
 
       def draw_border
-        draw_line(x,
-                  y,
-                  x + width - @style.border_width,
-                  y,
-                  @style.border_width,
-                  @style.border_color)
-        draw_line(x,
-                  y + @style.border_width,
-                  x,
-                  y + height - @style.border_width,
-                  @style.border_width,
-                  @style.border_color)
-        draw_line(x + @style.border_width,
-                  y + height - @style.border_width,
-                  x + width - @style.border_width,
-                  y + height - @style.border_width,
-                  @style.border_width,
-                  @style.border_color)
-        draw_line(x + width - @style.border_width,
-                  y,
-                  x + width - @style.border_width,
-                  y + height - @style.border_width,
-                  @style.border_width,
-                  @style.border_color)
+        draw_box(x, y, x + width, y + height, @style.border_width, @style.border_color)
       end
 
       def draw_image(x, y)
@@ -225,8 +202,11 @@ module DXRuby
         end
       end
 
-      def draw_scaled_image(x, y, image, scale_x: 1, scale_y: 1)
-        (target or Window).draw_scale(x, y, image, scale_x, scale_y, 0, 0)
+      def draw_box(x0, y0, x1, y1, width, color)
+        draw_line(x0, y0, x1 - width, y0, width, color)
+        draw_line(x0, y0, x0, y1 - width, width, color)
+        draw_line(x0, y1 - width, x1 - width, y1 - width, width, color)
+        draw_line(x1 - width, y0, x1 - width, y1 - width, width, color)
       end
 
       def update
