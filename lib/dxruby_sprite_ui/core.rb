@@ -36,31 +36,28 @@ module DXRuby
 
     end
 
-    class Base < Sprite
+    class StyleSet
 
-      include SpriteUI
-      include UI::Control
+      attr_reader :bg
 
-      attr_accessor :id
+      attr_accessor :border_width, :border_color
+      attr_accessor :margin, :padding
+      attr_accessor :width, :height
       attr_accessor :position, :top, :left
-      attr_accessor :padding
+      attr_accessor :visible
 
-      attr_writer :width, :height, :margin
-      attr_writer :visible
-
-      def initialize(id='', *args)
-        super(0, 0)
-        self.id = id
-        self.position = :relative
-        self.visible = true
-        self.top = 0
-        self.left = 0
-        self.margin = 0
-        self.padding = 0
-        self.collision = [0,0]
-        @border = nil
+      def initialize
+        @margin = 0
+        @padding = 0
         @bg = nil
-        init_control
+        @border_width = 0
+        @border_color = [0, 0, 0, 0]
+        @width = nil
+        @height = nil
+        @position = :relative
+        @top = 0
+        @left = 0
+        @visible = true
       end
 
       def bgcolor=(bgcolor)
@@ -87,9 +84,36 @@ module DXRuby
         @visible
       end
 
+    end
+
+    class Base < Sprite
+
+      include SpriteUI
+      include UI::Control
+
+      extend Forwardable
+
+      attr_accessor :id
+
+      def_delegators :@style, :bg=, :border=
+      def_delegators :@style, :position, :position=
+      def_delegators :@style, :top, :top=, :left, :left=
+      def_delegators :@style, :padding, :padding=
+
+      def_delegators :@style, :width=, :height=, :margin=
+      def_delegators :@style, :visible=, :visible?
+
+      def initialize(id='', *args)
+        super(0, 0)
+        self.id = id
+        self.collision = [0, 0]
+        @style = StyleSet.new
+        init_control
+      end
+
       def width
-        if @width
-          @width
+        if @style.width
+          @style.width
         elsif @computed_width
           @computed_width # + padding * 2
         else
@@ -106,8 +130,8 @@ module DXRuby
       end
 
       def height
-        if @height
-          @height
+        if @style.height
+          @style.height
         elsif @computed_height
           @computed_height # + padding * 2
         else
@@ -146,47 +170,47 @@ module DXRuby
         when :absolute
           0
         else
-          @margin
+          @style.margin
         end
       end
 
       def draw
         if visible?
-          draw_bg if @bg
+          draw_bg if @style.bg
           draw_image(x + padding, y + padding) if image
-          draw_border if @border_width and @border_color
+          draw_border if @style.border_width and @style.border_color
         end
       end
 
       def draw_bg
-        draw_scaled_image(x, y, @bg, scale_x: width, scale_y: height)
+        draw_scaled_image(x, y, @style.bg, scale_x: width, scale_y: height)
       end
 
       def draw_border
         draw_line(x,
                   y,
-                  x + width - @border_width,
+                  x + width - @style.border_width,
                   y,
-                  @border_width,
-                  @border_color)
+                  @style.border_width,
+                  @style.border_color)
         draw_line(x,
-                  y + @border_width,
+                  y + @style.border_width,
                   x,
-                  y + height - @border_width,
-                  @border_width,
-                  @border_color)
-        draw_line(x + @border_width,
-                  y + height - @border_width,
-                  x + width - @border_width,
-                  y + height - @border_width,
-                  @border_width,
-                  @border_color)
-        draw_line(x + width - @border_width,
+                  y + height - @style.border_width,
+                  @style.border_width,
+                  @style.border_color)
+        draw_line(x + @style.border_width,
+                  y + height - @style.border_width,
+                  x + width - @style.border_width,
+                  y + height - @style.border_width,
+                  @style.border_width,
+                  @style.border_color)
+        draw_line(x + width - @style.border_width,
                   y,
-                  x + width - @border_width,
-                  y + height - @border_width,
-                  @border_width,
-                  @border_color)
+                  x + width - @style.border_width,
+                  y + height - @style.border_width,
+                  @style.border_width,
+                  @style.border_color)
       end
 
       def draw_image(x, y)
@@ -257,7 +281,7 @@ module DXRuby
       end
 
       def flow_resize
-        max_width = (@width or (image and image.width) or Window.width)
+        max_width = (@style.width or (image and image.width) or Window.width)
         width = 0
         adjacent_vertical_space = padding
         adjacent_horizontal_space = padding
@@ -291,7 +315,7 @@ module DXRuby
       end
 
       def flow_move
-        max_width = (@width or (image and image.width) or Window.width)
+        max_width = (@style.width or (image and image.width) or Window.width)
         width = 0
         adjacent_vertical_space = padding
         adjacent_horizontal_space = padding
@@ -419,12 +443,12 @@ module DXRuby
       end
 
       def variable_width?
-        @width.nil? and (image.nil? or image.width.zero?)
+        @style.width.nil? and (image.nil? or image.width.zero?)
       end
       private :variable_width?
 
       def variable_height?
-        @height.nil? and (image.nil? or image.height.zero?)
+        @style.height.nil? and (image.nil? or image.height.zero?)
       end
       private :variable_height?
 
