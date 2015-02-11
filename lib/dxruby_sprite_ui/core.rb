@@ -115,7 +115,7 @@ module DXRuby
         if @style.width
           @style.width
         elsif @computed_width
-          @computed_width # + padding * 2
+          @computed_width
         else
           content_width
         end
@@ -133,7 +133,7 @@ module DXRuby
         if @style.height
           @style.height
         elsif @computed_height
-          @computed_height # + padding * 2
+          @computed_height
         else
           content_height
         end
