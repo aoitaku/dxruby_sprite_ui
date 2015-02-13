@@ -111,6 +111,11 @@ module DXRuby
         init_control
       end
 
+      def style(block=Proc.new)
+        @style = StyleSet.new
+        @style.instance_eval(&block)
+      end
+
       def width
         if @style.width
           @style.width
