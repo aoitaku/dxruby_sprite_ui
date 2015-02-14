@@ -47,13 +47,10 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
   #
   def flow_resize
     v_margin = padding
-    max_width = (@width or (image and image.width) or Window.width)
-    @computed_width = max_width
+    @computed_width = (@width or (image and image.width) or Window.width)
     @computed_height = components.lazy.each {|component|
-      component.resize(max_width, nil, padding)
-    }.slice_before(
-      &flow_slice(padding, 0, max_width)
-    ).inject(0) {|height, row|
+      component.resize(@computed_width, nil, padding)
+    }.slice_before(&components_overflow?).inject(0) {|height, row|
       component = row.max_by(&:layout_height)
       next height if component.position == :absolute
       v_space = [v_margin, component.margin].max + height
@@ -68,10 +65,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
   #
   def flow_move
     v_margin = padding
-    max_width = (@width or (image and image.width) or Window.width)
-    components.slice_before(
-      &flow_slice(padding, 0, max_width)
-    ).inject(0) do |height, row|
+    components.slice_before(&components_overflow?).inject(0) do |height, row|
       component = row.max_by(&:layout_height)
       max_component_height = component.height
       v_space = [v_margin, component.margin].max + height
@@ -96,7 +90,10 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
   #
   # Returns: Proc
   #
-  def flow_slice(h_margin, width, max_width)
+  def components_overflow?
+    h_margin = padding
+    width = 0
+    max_width = @computed_width
     -> component {
       next false if component.position == :absolute
       h_space = [h_margin, component.margin].max + component.width
@@ -112,7 +109,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
       end
     }
   end
-  private :flow_slice
+  private :components_overflow?
 
   ##############################################################################
   #
