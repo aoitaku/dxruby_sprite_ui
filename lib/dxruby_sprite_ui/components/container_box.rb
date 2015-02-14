@@ -7,9 +7,10 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
     self.layout = :vertical_box
   end
 
-  def resize
+  def resize(width, height, margin)
     super
     method(:"#{@layout}_resize").()
+    update_collision
   end
 
   def move(ox=0, oy=0)
@@ -18,149 +19,133 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
   end
 
   def flow_resize
-    adjacent_vertical_space = padding
-    @computed_width = (@style.width or (image and image.width) or Window.width)
-    @computed_height = flow_slice(true).inject(0) {|height, row|
+    v_margin = padding
+    max_width = (@width or (image and image.width) or Window.width)
+    @computed_width = max_width
+    @computed_height = components.lazy.each {|component|
+      component.resize
+    }.slice_before(
+      &flow_slice(padding, 0, max_width)
+    ).inject(0) {|height, row|
       component = row.max_by(&:layout_height)
-      vertical_space = [adjacent_vertical_space, component.margin].max
+      v_space = [v_margin, component.margin].max + height
       if component.position == :absolute
         height
       else
-        adjacent_vertical_space = component.margin
-        height + vertical_space + component.layout_height - component.margin * 2
+        v_margin = component.margin
+        v_space + component.height
       end
-    } + [adjacent_vertical_space, padding].max
+    } + [v_margin, padding].max
   end
 
   def flow_move
-    adjacent_vertical_space = padding
-    flow_slice.inject(0) {|height, row|
+    v_margin = padding
+    max_width = (@width or (image and image.width) or Window.width)
+    components.slice_before(
+      &flow_slice(padding, 0, max_width)
+    ).inject(0) {|height, row|
       component = row.max_by(&:layout_height)
-      max_height = component.layout_height
-      vertical_space = [adjacent_vertical_space, component.margin].max
-      adjacent_vertical_space = component.margin
-      adjacent_horizontal_space = padding
+      max_component_height = component.height
+      v_space = [v_margin, component.margin].max + height
+      v_margin = component.margin
+      h_margin = padding
       row.inject(0) {|width, component|
-        horizontal_space = [adjacent_horizontal_space, component.margin].max
+        h_space = [h_margin, component.margin].max + width
+        component.move(
+          self.x + h_space,
+          self.y + v_space + (max_component_height - component.height) / 2
+        )
         if component.position == :absolute
-          component.move(
-            self.x + horizontal_space + width,
-            self.y + vertical_space - adjacent_vertical_space + height + (max_height - component.height) / 2
-          )
           width
         else
-          component.move(
-            self.x + horizontal_space + width,
-            self.y + vertical_space + height + (max_height - component.layout_height) / 2
-          )
-          adjacent_horizontal_space = component.margin
-          width + horizontal_space + component.layout_width - component.margin * 2
+          h_margin = component.margin
+          h_space + component.width
         end
       }
-      height + vertical_space + max_height - component.margin * 2
+      v_space + max_component_height
     }
   end
 
-  def flow_slice(with_resize=false)
-    max_width = (@style.width or (image and image.width) or Window.width)
-    width = 0
-    adjacent_space = padding
-    components.slice_before {|component|
-      space = [adjacent_space, component.margin].max
-      component.resize if with_resize
-      if (component.position == :absolute)
-        false
+  def flow_slice(h_margin, width, max_width)
+    -> component {
+      h_space = [h_margin, component.margin].max + component.width
+      next false if component.position == :absolute
+      expected_width = width + component.layout_width + padding * 2
+      if width > 0 and expected_width > max_width
+        width = h_space
+        h_margin = padding
+        true
       else
-        if width > 0 and width + component.layout_width > max_width - padding * 2
-          width = space + component.layout_width - component.margin * 2
-          adjacent_space = padding
-          true
-        else
-          width += space + component.layout_width - component.margin * 2
-          adjacent_space = component.margin
-          false
-        end
+        width += h_space
+        h_margin = component.margin
+        false
       end
     }
   end
+  private :flow_slice
 
   def vertical_box_resize
-    width = 0
-    adjacent_space = padding
-    horizontal_space = 0
+    v_margin = padding
+    component = components.max_by(&:layout_width)
+    @computed_width = component.width + [component.margin, padding].max * 2
     @computed_height = components.inject(0) {|height, component|
-      vertical_space = [adjacent_space, component.margin].max
+      v_space = [v_margin, component.margin].max + height
       component.resize
-      if width < component.layout_width
-        width = component.layout_width
-        horizontal_space = component.margin
-      end
       if component.position == :absolute
         height
       else
-        adjacent_space = component.margin 
-        height + vertical_space + component.layout_height - component.margin * 2
+        v_margin = component.margin 
+        v_space + component.height
       end
-    } + [adjacent_space, padding].max
-    @computed_width = width - horizontal_space * 2 + [horizontal_space, padding].max * 2
+    } + [v_margin, padding].max
   end
 
   def vertical_box_move
-    adjacent_space = padding
+    v_margin = padding
     components.inject(0) {|height, component|
-      vertical_space = [adjacent_space, component.margin].max
+      v_space = [v_margin, component.margin].max + height
       component.move(
         self.x + [padding, component.margin].max,
-        self.y + vertical_space + height
+        self.y + v_space
       )
       if component.position == :absolute
         height
       else
-        adjacent_space = component.margin 
-        height + vertical_space + component.layout_height - component.margin * 2
+        v_margin = component.margin 
+        v_space + component.height
       end
     }
   end
 
   def horizontal_box_resize
-    height = 0
-    adjacent_space = padding
-    vertical_space = 0
+    h_margin = padding
+    component = components.max_by(&:layout_width)
+    @computed_height = component.height + [component.margin, padding].max * 2
     @computed_width = components.inject(0) {|width, component|
-      horizontal_space = [adjacent_space, component.margin].max
+      h_space = [h_margin, component.margin].max + width
       component.resize
-      if height < component.layout_height
-        height = component.layout_height
-        vertical_space = component.margin
-      end
       if component.position == :absolute
         width
       else
-        adjacent_space = component.margin
-        width + horizontal_space + component.layout_width - component.margin * 2
+        h_margin = component.margin
+        h_space + component.width
       end
-    } + [adjacent_space, padding].max
-    @computed_height = height - vertical_space + [vertical_space, padding].max * 2
+    } + [h_margin, padding].max
   end
 
   def horizontal_box_move
-    adjacent_space = padding
+    h_margin = padding
     components.inject(0) {|width, component|
-      horizontal_space = [adjacent_space, component.margin].max
-      vertical_space = [padding, component.margin].max
+      h_space = [h_margin, component.margin].max + width
+      component.move(
+        self.x + h_space,
+        self.y + (self.height - component.height) / 2
+      )
       if component.position == :absolute
-        component.move(
-          self.x + horizontal_space + width,
-          self.y + (self.height - component.height) / 2
-        )
         width
       else
-        component.move(
-          self.x + horizontal_space + width,
-          self.y + (self.height - component.layout_height - vertical_space) / 2 + vertical_space
-        )
-        adjacent_space = component.margin
-        width + horizontal_space + component.layout_width - component.margin * 2
+        h_margin = component.margin
+        h_space + component.width
       end
     }
   end
