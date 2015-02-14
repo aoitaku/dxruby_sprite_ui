@@ -77,4 +77,9 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     [text, param]
   end
 
+  def resize(width, height, margin)
+    super
+    update_collision
+  end
+
 end

@@ -119,8 +119,8 @@ module DXRuby
       end
 
       def width
-        if @style.width
-          @style.width
+        if @width
+          @width
         elsif @computed_width
           @computed_width
         else
@@ -137,8 +137,8 @@ module DXRuby
       end
 
       def height
-        if @style.height
-          @style.height
+        if @height
+          @height
         elsif @computed_height
           @computed_height
         else
@@ -220,7 +220,7 @@ module DXRuby
       end
 
       def layout(ox=0, oy=0)
-        resize
+        resize(width || Window.width, height || Window.height, 0)
         move(ox, oy)
       end
 
@@ -229,8 +229,31 @@ module DXRuby
         self.y = to_y + top
       end
 
-      def resize
-        self.collision = [0, 0, width, height]
+      def resize(width, height, margin)
+        case @style.width
+        when Integer
+          @width = @style.width
+        when Float
+          @width = width * @style.width
+        when :full
+          @width = width - [margin, self.margin].max * 2
+        else
+          @width = nil
+        end
+        case @style.height
+        when Integer
+          @height = @style.height
+        when Float
+          @height = height * @style.height
+        when :full
+          @height = height - [margin, self.margin].max * 2
+        else
+          @height = nil
+        end
+      end
+
+      def update_collision
+        self.collision = [0, 0, self.width, self.height]
       end
 
     end

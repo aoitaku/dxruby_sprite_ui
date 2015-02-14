@@ -23,7 +23,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
     max_width = (@width or (image and image.width) or Window.width)
     @computed_width = max_width
     @computed_height = components.lazy.each {|component|
-      component.resize
+      component.resize(max_width, nil, padding)
     }.slice_before(
       &flow_slice(padding, 0, max_width)
     ).inject(0) {|height, row|
@@ -90,7 +90,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
     @computed_width = component.width + [component.margin, padding].max * 2
     @computed_height = components.inject(0) {|height, component|
       v_space = [v_margin, component.margin].max + height
-      component.resize
+      component.resize(@computed_width, nil, padding)
       if component.position == :absolute
         height
       else
@@ -123,7 +123,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
     @computed_height = component.height + [component.margin, padding].max * 2
     @computed_width = components.inject(0) {|width, component|
       h_space = [h_margin, component.margin].max + width
-      component.resize
+      component.resize(nil, @computed_height, padding)
       if component.position == :absolute
         width
       else
