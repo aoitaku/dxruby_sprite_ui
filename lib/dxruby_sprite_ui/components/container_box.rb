@@ -71,7 +71,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
     max_width = (@width or (image and image.width) or Window.width)
     components.slice_before(
       &flow_slice(padding, 0, max_width)
-    ).inject(0) {|height, row|
+    ).inject(0) do |height, row|
       component = row.max_by(&:layout_height)
       max_component_height = component.height
       v_space = [v_margin, component.margin].max + height
@@ -79,20 +79,22 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
       h_margin = padding
       row.inject(0) do |width, component|
         h_space = [h_margin, component.margin].max + width
-        component.move(self.x + h_space, self.y + v_space + (max_component_height - component.height) / 2)
+        x = self.x + h_space
+        y = self.y + v_space + (max_component_height - component.height) / 2
+        component.move(x, y)
         next width if component.position == :absolute
         h_margin = component.margin
         h_space + component.width
       end
       v_space + max_component_height
-    }
+    end
   end
 
   ##############################################################################
   #
   # コンテナ幅に収まる位置でコンポーネントを列に分割するための判定用ブロック.
   #
-  # - Returns: Proc
+  # Returns: Proc
   #
   def flow_slice(h_margin, width, max_width)
     -> component {
@@ -137,7 +139,9 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
     v_margin = padding
     components.inject(0) do |height, component|
       v_space = [v_margin, component.margin].max + height
-      component.move(self.x + [padding, component.margin].max, self.y + v_space)
+      x = self.x + [padding, component.margin].max
+      y = self.y + v_space
+      component.move(x, y)
       next height if component.position == :absolute
       v_margin = component.margin 
       v_space + component.height
@@ -169,7 +173,9 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
     h_margin = padding
     components.inject(0) do |width, component|
       h_space = [h_margin, component.margin].max + width
-      component.move(self.x + h_space, self.y + (self.height - component.height) / 2)
+      x = self.x + h_space
+      y = self.y + (self.height - component.height) / 2
+      component.move(x, y)
       next width if component.position == :absolute
       h_margin = component.margin
       h_space + component.width
