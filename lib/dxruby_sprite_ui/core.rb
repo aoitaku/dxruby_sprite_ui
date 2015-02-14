@@ -95,13 +95,12 @@ module DXRuby
 
       attr_accessor :id
 
-      def_delegators :@style, :bg=, :border=
-      def_delegators :@style, :position, :position=
-      def_delegators :@style, :top, :top=, :left, :left=
-      def_delegators :@style, :padding, :padding=
+      attr_reader :style
 
-      def_delegators :@style, :width=, :height=, :margin=
-      def_delegators :@style, :visible=, :visible?
+      def_delegators :@style, :position
+      def_delegators :@style, :top, :left
+      def_delegators :@style, :padding
+      def_delegators :@style, :visible?
 
       def initialize(id='', *args)
         super(0, 0)
@@ -111,9 +110,12 @@ module DXRuby
         init_control
       end
 
-      def style(block=Proc.new)
-        @style = StyleSet.new
-        @style.instance_eval(&block)
+      def style_include?(name)
+        @style.respond_to?("#{name}=")
+      end
+
+      def style_set(name, args)
+        @style.__send__("#{name}=", args)
       end
 
       def width
