@@ -1,23 +1,50 @@
+################################################################################
+# 
+# 
+# 
+# 
+################################################################################
+
+################################################################################
+#
+# 
+#
 class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
 
   attr_writer :layout
 
+  ##############################################################################
+  #
+  # 
+  #
   def initialize(*args)
     super
     self.layout = :vertical_box
   end
 
+  ##############################################################################
+  #
+  # 
+  #
   def resize(width, height, margin)
     super
     method(:"#{@layout}_resize").()
     update_collision
   end
 
+  ##############################################################################
+  #
+  # 
+  #
   def move(ox=0, oy=0)
     super
     method(:"#{@layout}_move").()
   end
 
+  ##############################################################################
+  #
+  # 
+  #
   def flow_resize
     v_margin = padding
     max_width = (@width or (image and image.width) or Window.width)
@@ -35,6 +62,10 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
     } + [v_margin, padding].max
   end
 
+  ##############################################################################
+  #
+  # 
+  #
   def flow_move
     v_margin = padding
     max_width = (@width or (image and image.width) or Window.width)
@@ -57,6 +88,12 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
     }
   end
 
+  ##############################################################################
+  #
+  # コンテナ幅に収まる位置でコンポーネントを列に分割するための判定用ブロック.
+  #
+  # - Returns: Proc
+  #
   def flow_slice(h_margin, width, max_width)
     -> component {
       next false if component.position == :absolute
@@ -75,6 +112,10 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
   end
   private :flow_slice
 
+  ##############################################################################
+  #
+  # 
+  #
   def vertical_box_resize
     v_margin = padding
     component = components.max_by(&:layout_width)
@@ -88,6 +129,10 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
     } + [v_margin, padding].max
   end
 
+  ##############################################################################
+  #
+  # 
+  #
   def vertical_box_move
     v_margin = padding
     components.inject(0) do |height, component|
@@ -99,6 +144,10 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
     end
   end
 
+  ##############################################################################
+  #
+  # 
+  #
   def horizontal_box_resize
     h_margin = padding
     component = components.max_by(&:layout_width)
@@ -112,6 +161,10 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
     } + [h_margin, padding].max
   end
 
+  ##############################################################################
+  #
+  # 
+  #
   def horizontal_box_move
     h_margin = padding
     components.inject(0) do |width, component|
