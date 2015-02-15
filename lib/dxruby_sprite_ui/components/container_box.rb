@@ -1,8 +1,9 @@
 ################################################################################
 #
-# 
+# ContainerBox
 #
-# 
+# Author:  aoitaku
+# Licence: zlib/libpng
 #
 ################################################################################
 
@@ -10,15 +11,18 @@
 
 ################################################################################
 #
-# 
+# ContainerBox クラス.
 #
 class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
 
+  # layout プロパティ.
   attr_writer :layout
 
   ##############################################################################
   #
-  # 
+  # インスタンスの初期化.
+  #
+  # See: SpriteUI::Container#initialize
   #
   def initialize(*args)
     super
@@ -27,30 +31,47 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
 
   ##############################################################################
   #
-  # 
+  # コンポーネントの領域の更新.
+  #
+  # layout プロパティに応じたリサイズを行う.
+  #
+  # Params:
+  #   - width  = 親要素の幅.
+  #   - height = 親要素の高さ.
+  #   - margin = 親要素からの余白.
   #
   def resize(width, height, margin)
     super
     method(:"#{@layout}_resize").()
     update_collision
+    self
   end
 
   ##############################################################################
   #
-  # 
+  # コンポーネントの座標の更新.
+  #
+  # layout プロパティに応じた移動を行う.
+  #
+  # Params:
+  #   - ox = 親要素の x 座標.
+  #   - oy = 親要素の y 座標.
   #
   def move(ox=0, oy=0)
     super
     method(:"#{@layout}_move").()
+    self
   end
 
   ##############################################################################
   #
-  # 
+  # フローレイアウト時のコンポーネントの領域を更新する.
+  #
+  # 子コンポーネントの resize を行う.
   #
   def flow_resize
     v_margin = padding
-    @computed_width = (@width or (image and image.width) or Window.width)
+    @computed_width = (@width or (image and image.width))
     @computed_height = components.lazy.each {|component|
       component.resize(@computed_width, nil, padding)
     }.slice_before(&components_overflow?).inject(0) {|height, row|
@@ -64,7 +85,9 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
 
   ##############################################################################
   #
-  # 
+  # フローレイアウト時のコンポーネントの座標を更新する.
+  #
+  # 子コンポーネントの move を行う.
   #
   def flow_move
     v_margin = padding
@@ -91,7 +114,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
   #
   # コンテナ幅に収まる位置でコンポーネントを列に分割するための判定用ブロック.
   #
-  # Returns: Proc
+  # Returns: Proc (lambda)
   #
   def components_overflow?
     h_margin = padding
@@ -116,7 +139,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
 
   ##############################################################################
   #
-  # 
+  # 垂直ボックスレイアウト時のコンポーネントの領域を更新する.
   #
   def vertical_box_resize
     v_margin = padding
@@ -133,7 +156,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
 
   ##############################################################################
   #
-  # 
+  # 垂直ボックスレイアウト時のコンポーネントの座標を更新する.
   #
   def vertical_box_move
     v_margin = padding
@@ -150,7 +173,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
 
   ##############################################################################
   #
-  # 
+  # 水平ボックスレイアウト時のコンポーネントの領域を更新する.
   #
   def horizontal_box_resize
     h_margin = padding
@@ -167,7 +190,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
 
   ##############################################################################
   #
-  # 
+  # 水平ボックスレイアウト時のコンポーネントの座標を更新する.
   #
   def horizontal_box_move
     h_margin = padding
