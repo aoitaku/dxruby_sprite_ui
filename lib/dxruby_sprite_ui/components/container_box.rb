@@ -71,7 +71,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
   #
   def flow_resize
     v_margin = padding
-    @computed_width = (@width or (image and image.width))
+    @computed_width = (@width or (image and image.width) or Window.width)
     @computed_height = components.lazy.each {|component|
       component.resize(@computed_width, nil, padding)
     }.slice_before(&components_overflow?).inject(0) {|height, row|
