@@ -42,7 +42,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
   #
   def resize(width, height, margin)
     super
-    method(:"#{@layout}_resize").()
+    __send__(:"#{@layout}_resize")
     update_collision
     self
   end
@@ -59,7 +59,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
   #
   def move(ox=0, oy=0)
     super
-    method(:"#{@layout}_move").()
+    __send__(:"#{@layout}_move")
     self
   end
 
@@ -82,6 +82,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
       v_space + component.height
     } + [v_margin, padding].max
   end
+  private :flow_resize
 
   ##############################################################################
   #
@@ -109,6 +110,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
       v_space + max_component_height
     end
   end
+  private :flow_move
 
   ##############################################################################
   #
@@ -153,6 +155,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
       v_space + component.height
     } + [v_margin, padding].max
   end
+  private :vertical_box_resize
 
   ##############################################################################
   #
@@ -170,6 +173,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
       v_space + component.height
     end
   end
+  private :vertical_box_move
 
   ##############################################################################
   #
@@ -187,6 +191,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
       h_space + component.width
     } + [h_margin, padding].max
   end
+  private :horizontal_box_resize
 
   ##############################################################################
   #
@@ -204,5 +209,6 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
       h_space + component.width
     end
   end
+  private :horizontal_box_move
 
 end
