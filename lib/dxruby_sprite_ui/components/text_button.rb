@@ -17,8 +17,15 @@
 #
 class Quincite::UI::TextButton < Quincite::UI::TextLabel
 
-  # color プロパティ.
-  # $TODO: style に分離すべき
+  # Property:
+  #
+  #   color プロパティ.
+  #   $TODO: style に分離すべき.
+  #
+  #   - disable_color : 無効化中の描画色.
+  #   - active_color  : アクティブ中の描画色.
+  #   - hover_color   : マウスオーバー中の描画色.
+  #
   attr_accessor :disable_color, :active_color, :hover_color
 
   ##############################################################################
@@ -73,9 +80,9 @@ class Quincite::UI::TextButton < Quincite::UI::TextLabel
 
   ##############################################################################
   #
-  # 現在の文字色を取得する
+  # 現在の文字色を取得する.
   #
-  # Returns: Array ([a, r, g, b])
+  # Returns: Array ([FixNum a, r, g, b])
   #
   def color
     if disable?
