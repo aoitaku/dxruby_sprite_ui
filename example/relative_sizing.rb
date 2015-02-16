@@ -12,50 +12,61 @@ ui = SpriteUI::build {
   }
   ContainerBox {
     layout :flow
+    margin 2
+    top -2
     width :full
-    margin 4
     ContainerBox {
+      layout :flow
       width 0.5
-      layout :vertical_box
-      border width: 1, color: 0xffffff
-      padding 4
-      TextLabel {
+      ContainerBox {
+        border width: 1, color: 0xffffff
+        layout :vertical_box
+        width :full
         padding 4
-        text 'フローレイアウト.'
-      }
-      TextLabel {
-        padding 4
-        text "このコンテナは"
-      }
-      TextLabel {
-        padding 4
-        text '自動配置の際に'
-      }
-      TextLabel {
-        padding 4
-        text 'コンテナ幅'
+        margin 2
+        TextLabel {
+          padding 4
+          text '50% 幅の'
+        }
+        TextLabel {
+          padding 4
+          text "ボックスいっぱいに"
+        }
+        TextLabel {
+          padding 4
+          text 'テキストラベルの'
+        }
+        TextLabel {
+          padding 4
+          text '領域があります'
+        }
       }
     }
     ContainerBox {
+      layout :flow
       width 0.5
-      layout :vertical_box
-      border width: 1, color: 0xffffff
-      padding 4
-      TextLabel {
+      ContainerBox {
+        layout :vertical_box
+        border width: 1, color: 0xffffff
+        width :full
         padding 4
-        text '垂直ボックスレイアウト.'
-      }
-      TextLabel {
-        padding 4
-        text 'このコンテナは'
-      }
-      TextLabel {
-        padding 4
-        text '垂直方向に'
-      }
-      TextLabel {
-        padding 4
-        text '自動配置されます.'
+        margin 2
+        TextLabel {
+          padding 4
+          text '右側のボックスも'
+        }
+        TextLabel {
+          padding 4
+          text '50% の幅で'
+        }
+        TextLabel {
+          padding 4
+          text 'テキストラベルを'
+        }
+        TextLabel {
+          padding 4
+          text '垂直に並べています'
+        }
       }
     }
   }
