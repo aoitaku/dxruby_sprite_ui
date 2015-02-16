@@ -1,14 +1,57 @@
+################################################################################
+#
+# TextLabel
+#
+# Author:  aoitaku
+# Licence: zlib/libpng
+#
+################################################################################
+
+
+
+################################################################################
+#
+# TextLabel クラス.
+#
+# 文字列を描画するためのシンプルなコンポーネント.
+#
 class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
 
+  # ReadOnly:
+  #
+  #   - text: 描画するテキスト.
+  #   - font: 描画に用いるフォント (DXRuby::Font オブジェクト).
+  #
   attr_reader :text, :font
+
+  # Property:
+  #
+  #   - aa          : アンチエイリアスの有無.
+  #   - color       : 描画の文字色.
+  #   - text_edge   : 袋文字のパラメータ.
+  #   - text_shadow : 文字影のパラメータ.
+  #
   attr_accessor :aa, :color, :text_edge, :text_shadow
 
+  ##############################################################################
+  #
+  # インスタンスの初期化.
+  #
+  # See: SpriteUI::Base#initialize
+  #
   def initialize(id='', text='', x=0, y=0, *argv)
     super(id, x, y)
     self.text = text
     @font = Font.default
   end
 
+  ##############################################################################
+  #
+  # フォントを設定する.
+  #
+  # Params:
+  #   - font : 文字列描画に使う DXRuby::Font オブジェクト.
+  #
   def font=(font)
     case font
     when Font
@@ -20,15 +63,34 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     end
   end
 
+  ##############################################################################
+  #
+  # 文字列を設定する.
+  #
+  # Params:
+  #   - text : テキストラベルに表示する文字列.
+  #
   def text=(text)
     @text = text.to_s
   end
 
+  ##############################################################################
+  #
+  # 描画する.
+  #
+  # See: SpriteUI::TextRenderer.draw
+  #
   def draw
     super
     TextRenderer.draw(x + padding, y + padding, self, context) if visible?
   end
 
+  ##############################################################################
+  #
+  # 領域の幅を取得する.
+  #
+  # テキストの描画幅にパディングを含めた幅を返す.
+  #
   def content_width
     if text.empty?
       super
@@ -39,6 +101,12 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     end
   end
 
+  ##############################################################################
+  #
+  # 領域の高さを取得する.
+  #
+  # テキストの描画高さにパディングを含めた高さを返す.
+  #
   def content_height
     if text.empty?
       super
@@ -47,10 +115,22 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     end
   end
 
+  ##############################################################################
+  #
+  # 描画コンテキストを取得する.
+  #
+  # Returns: SpriteUI::Context
+  #
   def context
     Context[target, font]
   end
 
+  ##############################################################################
+  #
+  # 文字描画パラメータを取得する.
+  #
+  # Returns: Array ([String text, Hash params])
+  #
   def draw_params
     param = {}
     if text_edge
@@ -77,6 +157,10 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     [text, param]
   end
 
+  ##############################################################################
+  #
+  # コンポーネントの領域の更新.
+  #
   def resize(width, height, margin)
     super
     update_collision
