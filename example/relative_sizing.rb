@@ -1,6 +1,7 @@
 require 'dxruby_sprite_ui'
 Font.default = Font.new(18, 'ＭＳ ゴシック')
 
+SpriteUI.equip :MouseEventHandler
 ui = SpriteUI::build {
   layout :flow
   TextLabel {
@@ -23,21 +24,25 @@ ui = SpriteUI::build {
         width :full
         padding 4
         margin 2
-        TextLabel {
+        TextButton {
           padding 4
           text '50% 幅の'
+          width :full
         }
-        TextLabel {
+        TextButton {
           padding 4
           text "ボックスいっぱいに"
+          width :full
         }
-        TextLabel {
+        TextButton {
           padding 4
-          text 'テキストラベルの'
+          text 'テキストボタンの'
+          width :full
         }
-        TextLabel {
+        TextButton {
           padding 4
           text '領域があります'
+          width :full
         }
       }
     }
@@ -49,28 +54,34 @@ ui = SpriteUI::build {
         width :full
         padding 4
         margin 2
-        TextLabel {
+        TextButton {
           padding 4
           text '右側のボックスも'
+          width :full
         }
-        TextLabel {
+        TextButton {
           padding 4
           text '50% の幅で'
+          width :full
         }
-        TextLabel {
+        TextButton {
           padding 4
-          text 'テキストラベルを'
+          text 'テキストボタンを'
+          width :full
         }
-        TextLabel {
+        TextButton {
           padding 4
           text '垂直に並べています'
+          width :full
         }
       }
     }
   }
 }
 ui.layout
-
+mouse_event_dispatcher = SpriteUI::MouseEventDispatcher.new(ui)
 Window.loop do
+  mouse_event_dispatcher.update
+  mouse_event_dispatcher.dispatch
   ui.draw
 end
