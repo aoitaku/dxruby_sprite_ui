@@ -145,15 +145,15 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
   #
   def vertical_box_resize
     v_margin = padding
-    component = components.max_by(&:layout_width)
-    @computed_width = component.width + [component.margin, padding].max * 2
     @computed_height = components.inject(0) {|height, component|
-      component.resize(@computed_width, nil, padding)
+      component.resize(self.width, nil, padding)
       next height if component.position == :absolute
       v_space = [v_margin, component.margin].max + height
       v_margin = component.margin 
       v_space + component.height
     } + [v_margin, padding].max
+    component = components.max_by(&:layout_width)
+    @computed_width = component.width + [component.margin, padding].max * 2
   end
   private :vertical_box_resize
 
@@ -181,15 +181,15 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
   #
   def horizontal_box_resize
     h_margin = padding
-    component = components.max_by(&:layout_width)
-    @computed_height = component.height + [component.margin, padding].max * 2
     @computed_width = components.inject(0) {|width, component|
-      component.resize(nil, @computed_height, padding)
+      component.resize(nil, self.height, padding)
       next width if component.position == :absolute
       h_space = [h_margin, component.margin].max + width
       h_margin = component.margin
       h_space + component.width
     } + [h_margin, padding].max
+    component = components.max_by(&:layout_width)
+    @computed_height = component.height + [component.margin, padding].max * 2
   end
   private :horizontal_box_resize
 

@@ -16,7 +16,6 @@ ui = SpriteUI::build {
     top -2
     width :full
     ContainerBox {
-      layout :flow
       width 0.5
       ContainerBox {
         border width: 1, color: 0xffffff
@@ -43,7 +42,6 @@ ui = SpriteUI::build {
       }
     }
     ContainerBox {
-      layout :flow
       width 0.5
       ContainerBox {
         layout :vertical_box
