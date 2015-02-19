@@ -31,7 +31,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   #   - text_edge   : 袋文字のパラメータ.
   #   - text_shadow : 文字影のパラメータ.
   #
-  attr_accessor :aa, :color, :text_edge, :text_shadow
+  attr_accessor :aa, :color, :text_edge, :text_shadow, :text_align
 
   ##############################################################################
   #
@@ -149,6 +149,9 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
         param[:shadow_x] = text_shadow[:x] if text_shadow[:x]
         param[:shadow_y] = text_shadow[:y] if text_shadow[:y]
       end
+    end
+    if text_align
+      param[:text_align] = text_align
     end
     if color
       param[:color] = color
