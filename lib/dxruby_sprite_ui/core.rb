@@ -83,7 +83,7 @@ module DXRuby
       attr_accessor :border_width, :border_color
       attr_accessor :margin, :padding
       attr_accessor :width, :height
-      attr_accessor :position, :top, :left
+      attr_accessor :position, :top, :left, :bottom, :right
       attr_accessor :visible
 
       ##########################################################################
@@ -99,8 +99,10 @@ module DXRuby
         @width = nil
         @height = nil
         @position = :relative
-        @top = 0
-        @left = 0
+        @top = nil
+        @left = nil
+        @bottom = nil
+        @right = nil
         @visible = true
       end
 
@@ -167,7 +169,7 @@ module DXRuby
       # 
       #
       def_delegators :@style, :position
-      def_delegators :@style, :top, :left
+      def_delegators :@style, :top, :left, :bottom, :right
       def_delegators :@style, :padding
       def_delegators :@style, :visible?
 
@@ -370,18 +372,30 @@ module DXRuby
       #
       # コンポーネントの配置.
       #
-      def layout(ox=0, oy=0)
-        resize(width || Window.width, height || Window.height, 0)
-        move(ox, oy)
+      def layout(ox=0, oy=0, parent=Window)
+        resize(width, height, 0)
+        move(ox, oy, parent.width, parent.height)
       end
 
       ##########################################################################
       #
       # コンポーネントの座標の更新.
       #
-      def move(to_x, to_y)
-        self.x = to_x + left
-        self.y = to_y + top
+      def move(to_x, to_y, width, height)
+        if left
+          self.x = to_x + left
+        elsif right
+          self.x = to_x + width - self.width - right
+        else
+          self.x = to_x
+        end
+        if top
+          self.y = to_y + top
+        elsif bottom
+          self.y = to_y + height - bottom
+        else
+          self.y = to_y
+        end
       end
 
       ##########################################################################

@@ -57,7 +57,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
   #   - ox = 親要素の x 座標.
   #   - oy = 親要素の y 座標.
   #
-  def move(ox=0, oy=0)
+  def move(ox=0, oy=0, width, height)
     super
     __send__(:"#{@layout}_move")
     self
@@ -102,7 +102,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
         h_space = [h_margin, component.margin].max + width
         x = self.x + h_space
         y = self.y + v_space + (max_component_height - component.height) / 2
-        component.move(x, y)
+        component.move(x, y, self.width - self.padding * 2, self.height - self.padding * 2)
         next width if component.position == :absolute
         h_margin = component.margin
         h_space + component.width
@@ -167,7 +167,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
       v_space = [v_margin, component.margin].max + height
       x = self.x + [padding, component.margin].max
       y = self.y + v_space
-      component.move(x, y)
+      component.move(x, y, self.width - self.padding * 2, self.height - self.padding * 2)
       next height if component.position == :absolute
       v_margin = component.margin 
       v_space + component.height
@@ -203,7 +203,7 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
       h_space = [h_margin, component.margin].max + width
       x = self.x + h_space
       y = self.y + (self.height - component.height) / 2
-      component.move(x, y)
+      component.move(x, y, self.width - self.padding * 2, self.height - self.padding * 2)
       next width if component.position == :absolute
       h_margin = component.margin
       h_space + component.width
