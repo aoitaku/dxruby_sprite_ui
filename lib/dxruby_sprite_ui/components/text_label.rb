@@ -17,14 +17,14 @@
 #
 class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
 
-  # ReadOnly:
+  # Readables:
   #
   #   - text: 描画するテキスト.
   #   - font: 描画に用いるフォント (DXRuby::Font オブジェクト).
   #
   attr_reader :text, :font
 
-  # Property:
+  # Accessors:
   #
   #   - aa          : アンチエイリアスの有無.
   #   - color       : 描画の文字色.

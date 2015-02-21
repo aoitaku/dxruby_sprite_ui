@@ -1,11 +1,51 @@
+################################################################################
+#
+# TextRenderer
+#
+# Author:  aoitaku
+# Licence: zlib/libpng
+#
+################################################################################
+
+
+
+################################################################################
+#
+# Context クラス.
+#
+# 文字列の描画に用いる DXRuby::RenderTarget と DXRuby::Font を保持する構造体.
+#
+# Accessors:
+#   - target : DXRuby::RenderTarget 描画先の RenderTarget オブジェクト.
+#   - font   : DXRuby::Font 描画に用いる Font オブジェクト.
+#
 module DXRuby::SpriteUI
 
   Context = Struct.new(:target, :font)
 
 end
 
+################################################################################
+#
+# TextRenderer クラス.
+#
+# 文字列描画コンテキストと描画対象、座標を元に文字列の描画を行う.
+#
 module DXRuby::SpriteUI::TextRenderer
 
+  ##############################################################################
+  #
+  # 描画を行う.
+  #
+  # Params:
+  #   - x        : x 座標.
+  #   - y        : y 座標.
+  #   - drawable : draw_params メソッドを実装したオブジェクト.
+  #   - context  : SpriteUI::Context オブジェクト.
+  #
+  # Todo:
+  #   drawable.width を drawable 経由でない方法で参照する方法を検討する.
+  #
   def self.draw(x, y, drawable, context)
     text, params = *drawable.draw_params
     target, font = context.target, context.font

@@ -17,7 +17,7 @@
 #
 class Quincite::UI::TextButton < Quincite::UI::TextLabel
 
-  # Property:
+  # Accessors:
   #
   #   color プロパティ.
   #   $TODO: style に分離すべき.
