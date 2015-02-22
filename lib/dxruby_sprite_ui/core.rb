@@ -373,26 +373,28 @@ module DXRuby
       # コンポーネントの配置.
       #
       def layout(ox=0, oy=0, parent=Window)
-        resize(width, height, 0)
-        move(ox, oy, parent.width, parent.height)
+        resize(parent)
+        move(ox, oy, parent)
       end
 
       ##########################################################################
       #
       # コンポーネントの座標の更新.
       #
-      def move(to_x, to_y, width, height)
+      def move(to_x, to_y, parent)
         if left
           self.x = to_x + left
         elsif right
-          self.x = to_x + width - self.width - right
+          inner_width = parent.width - [parent.padding, self.margin].max * 2
+          self.x = to_x + inner_width - self.width - right
         else
           self.x = to_x
         end
         if top
           self.y = to_y + top
         elsif bottom
-          self.y = to_y + height - bottom
+          inner_height = parent.height - [parent.padding, self.margin].max * 2
+          self.y = to_y + inner_height - self.height - bottom
         else
           self.y = to_y
         end
@@ -402,14 +404,14 @@ module DXRuby
       #
       # コンポーネントの領域の更新.
       #
-      def resize(width, height, margin)
+      def resize(parent)
         case @style.width
         when Integer
           @width = @style.width
         when Float
-          @width = width * @style.width
+          @width = parent.width * @style.width
         when :full
-          @width = width - [margin, self.margin].max * 2
+          @width = parent.width - [parent.margin, self.margin].max * 2
         else
           @width = nil
         end
@@ -417,9 +419,9 @@ module DXRuby
         when Integer
           @height = @style.height
         when Float
-          @height = height * @style.height
+          @height = parent.height * @style.height
         when :full
-          @height = height - [margin, self.margin].max * 2
+          @height = parent.height - [parent.margin, self.margin].max * 2
         else
           @height = nil
         end

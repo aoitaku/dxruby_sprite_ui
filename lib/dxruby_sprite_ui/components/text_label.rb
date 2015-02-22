@@ -164,7 +164,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   #
   # コンポーネントの領域の更新.
   #
-  def resize(width, height, margin)
+  def resize(parent)
     super
     update_collision
   end
