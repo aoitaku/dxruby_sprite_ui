@@ -383,18 +383,48 @@ module DXRuby
       #
       def move(to_x, to_y, parent)
         if left
-          self.x = to_x + left
+          case left
+          when Integer
+            self.x = to_x + left
+          when Float
+            inner_width = parent.width - [parent.padding, self.margin].max * 2
+            self.x = to_x + (inner_width - self.width) * left
+          else
+            self.x = to_x
+          end
         elsif right
           inner_width = parent.width - [parent.padding, self.margin].max * 2
-          self.x = to_x + inner_width - self.width - right
+          case right
+          when Integer
+            self.x = to_x + inner_width - self.width - right
+          when Float
+            self.x = to_x - (inner_width - self.width) * (right - 1.0)
+          else
+            self.x = to_x
+          end
         else
           self.x = to_x
         end
         if top
-          self.y = to_y + top
+          case bottom
+          when Integer
+            self.y = to_y + top
+          when Float
+            inner_height = parent.height - [parent.padding, self.margin].max * 2
+            self.y = to_y + (inner_height - self.height) * top
+          else
+            self.y = to_y
+          end
         elsif bottom
           inner_height = parent.height - [parent.padding, self.margin].max * 2
-          self.y = to_y + inner_height - self.height - bottom
+          case bottom
+          when Integer
+            self.y = to_y + inner_height - self.height - bottom
+          when Float
+            self.y = to_y - (inner_height - self.height) * (bottom - 1.0)
+          else
+            self.y = to_y
+          end
         else
           self.y = to_y
         end
