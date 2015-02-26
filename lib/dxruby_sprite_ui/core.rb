@@ -379,51 +379,55 @@ module DXRuby
 
       ##########################################################################
       #
+      # コンポーネント内部の幅を取得する.
+      #
+      def inner_width(parent)
+        parent.width - [parent.padding, self.margin].max * 2
+      end
+
+      ##########################################################################
+      #
+      # コンポーネント内部の高さを取得する.
+      #
+      def inner_height(parent)
+        parent.height - [parent.padding, self.margin].max * 2
+      end
+
+      ##########################################################################
+      #
       # コンポーネントの座標の更新.
       #
       def move(to_x, to_y, parent)
-        if left
+        if left and Numeric === left
           case left
           when Integer
             self.x = to_x + left
           when Float
-            inner_width = parent.width - [parent.padding, self.margin].max * 2
-            self.x = to_x + (inner_width - self.width) * left
-          else
-            self.x = to_x
+            self.x = to_x + (inner_width(parent) - self.width) * left
           end
-        elsif right
-          inner_width = parent.width - [parent.padding, self.margin].max * 2
+        elsif right and Numeric === right
           case right
           when Integer
-            self.x = to_x + inner_width - self.width - right
+            self.x = to_x + inner_width(parent) - self.width - right
           when Float
-            self.x = to_x - (inner_width - self.width) * (right - 1.0)
-          else
-            self.x = to_x
+            self.x = to_x - (inner_width(parent) - self.width) * (right - 1)
           end
         else
           self.x = to_x
         end
-        if top
-          case bottom
+        if top and Numeric === top
+          case top
           when Integer
             self.y = to_y + top
           when Float
-            inner_height = parent.height - [parent.padding, self.margin].max * 2
-            self.y = to_y + (inner_height - self.height) * top
-          else
-            self.y = to_y
+            self.y = to_y + (inner_height(parent) - self.height) * top
           end
-        elsif bottom
-          inner_height = parent.height - [parent.padding, self.margin].max * 2
+        elsif bottom and Numeric === bottom
           case bottom
           when Integer
-            self.y = to_y + inner_height - self.height - bottom
+            self.y = to_y + inner_height(parent) - self.height - bottom
           when Float
-            self.y = to_y - (inner_height - self.height) * (bottom - 1.0)
-          else
-            self.y = to_y
+            self.y = to_y - (inner_height(parent) - self.height) * (bottom - 1)
           end
         else
           self.y = to_y
