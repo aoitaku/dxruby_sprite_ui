@@ -68,11 +68,10 @@ module DXRuby::SpriteUI::TextRenderer
       /\s/ === e or not (e + prev).ascii_only?
     }.reject {|char| char.reject {|c| /\s/ === c }.empty? }.to_a
     if chars.size == 1
-      width = drawable.width - font.get_width(text)
-      draw_font[x + width / 2, y, text, font, params]
+      draw_font[x + (drawable.width - font.get_width(text)) / 2, y, text, font, params]
     else
-      width = (drawable.width - drawable.padding * 2) - font.get_width(chars.join)
-      pad = width / (chars.size - 1)
+      inner_width = (drawable.width - drawable.padding * 2)
+      pad = (inner_width - font.get_width(chars.join)) / (chars.size - 1)
       chars.inject(x) do |x, char|
         draw_font[x, y, char.join, font, params]
         x + font.get_width(char.join) + pad
