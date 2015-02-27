@@ -77,11 +77,11 @@ module DXRuby
       # 
       #
       attr_reader :bg
+      attr_reader :margin, :padding
 
       # 
       #
       attr_accessor :border_width, :border_color
-      attr_accessor :margin, :padding
       attr_accessor :width, :height
       attr_accessor :position, :top, :left, :bottom, :right
       attr_accessor :visible
@@ -91,8 +91,8 @@ module DXRuby
       # 初期化.
       #
       def initialize
-        @margin = 0
-        @padding = 0
+        @margin = [0, 0, 0, 0]
+        @padding = [0, 0, 0, 0]
         @bg = nil
         @border_width = 0
         @border_color = [0, 0, 0, 0]
@@ -136,6 +136,122 @@ module DXRuby
 
       ##########################################################################
       #
+      # マージンを設定する.
+      #
+      def margin=(*args)
+        case args
+        when Numeric
+          @margin = [args] * 4
+        when Array
+          case args.size
+          when 1
+            @margin = args * 4
+          when 2
+            @margin = args * 2
+          when 3
+            @margin = [*args, args[1]]
+          when 4
+            @margin = args
+          else
+            @margin = args[0...4]
+          end
+        else
+          @margin = [0, 0, 0, 0]
+        end
+      end
+
+      ##########################################################################
+      #
+      #
+      #
+      def margin_top
+        @margin[0]
+      end
+
+      ##########################################################################
+      #
+      #
+      #
+      def margin_right
+        @margin[1]
+      end
+
+      ##########################################################################
+      #
+      #
+      #
+      def margin_bottom
+        @margin[2]
+      end
+
+      ##########################################################################
+      #
+      #
+      #
+      def margin_left
+        @margin[3]
+      end
+
+      ##########################################################################
+      #
+      # パディングを設定する.
+      #
+      def padding=(args)
+        case args
+        when Numeric
+          @padding = [args] * 4
+        when Array
+          case args.size
+          when 1
+            @padding = args * 4
+          when 2
+            @padding = args * 2
+          when 3
+            @padding = [*args, args[1]]
+          when 4
+            @padding = args
+          else
+            @padding = args[0...4]
+          end
+        else
+          @padding = [0, 0, 0, 0]
+        end
+      end
+
+      ##########################################################################
+      #
+      #
+      #
+      def padding_top
+        @padding[0]
+      end
+
+      ##########################################################################
+      #
+      #
+      #
+      def padding_right
+        @padding[1]
+      end
+
+      ##########################################################################
+      #
+      #
+      #
+      def padding_bottom
+        @padding[2]
+      end
+
+      ##########################################################################
+      #
+      #
+      #
+      def padding_left
+        @padding[3]
+      end
+
+      ##########################################################################
+      #
       # 可視状態を取得する.
       #
       # Returns:
@@ -170,7 +286,6 @@ module DXRuby
       #
       def_delegators :@style, :position
       def_delegators :@style, :top, :left, :bottom, :right
-      def_delegators :@style, :padding
       def_delegators :@style, :visible?
 
       ##########################################################################
@@ -298,8 +413,16 @@ module DXRuby
         when :absolute
           0
         else
-          @style.margin
+          @style.margin[0]
         end
+      end
+
+      ##########################################################################
+      #
+      # コンポーネントの内側の余白を取得する.
+      #
+      def padding
+        @style.padding[0]
       end
 
       ##########################################################################
