@@ -70,7 +70,7 @@ module DXRuby::SpriteUI::TextRenderer
     if chars.size == 1
       draw_font[x + (drawable.width - font.get_width(text)) / 2, y, text, font, params]
     else
-      inner_width = (drawable.width - drawable.padding * 2)
+      inner_width = drawable.width - drawable.padding_left + drawable.padding_right
       pad = (inner_width - font.get_width(chars.join)) / (chars.size - 1)
       chars.inject(x) do |x, char|
         draw_font[x, y, char.join, font, params]

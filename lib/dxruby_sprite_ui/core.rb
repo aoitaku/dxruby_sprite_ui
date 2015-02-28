@@ -387,7 +387,7 @@ module DXRuby
         when :absolute
           0
         else
-          width + margin * 2
+          width + margin_left + margin_right
         end
       end
 
@@ -400,7 +400,7 @@ module DXRuby
         when :absolute
           0
         else
-          height + margin * 2
+          height + margin_top + margin_bottom
         end
       end
 
@@ -408,7 +408,7 @@ module DXRuby
       #
       # コンポーネントの外側の余白を取得する.
       #
-      def margin
+      def margin_top
         case position
         when :absolute
           0
@@ -419,10 +419,73 @@ module DXRuby
 
       ##########################################################################
       #
+      # コンポーネントの外側の余白を取得する.
+      #
+      def margin_right
+        case position
+        when :absolute
+          0
+        else
+          @style.margin[1]
+        end
+      end
+
+      ##########################################################################
+      #
+      # コンポーネントの外側の余白を取得する.
+      #
+      def margin_bottom
+        case position
+        when :absolute
+          0
+        else
+          @style.margin[2]
+        end
+      end
+
+      ##########################################################################
+      #
+      # コンポーネントの外側の余白を取得する.
+      #
+      def margin_left
+        case position
+        when :absolute
+          0
+        else
+          @style.margin[3]
+        end
+      end
+
+      ##########################################################################
+      #
       # コンポーネントの内側の余白を取得する.
       #
-      def padding
+      def padding_top
         @style.padding[0]
+      end
+
+      ##########################################################################
+      #
+      # コンポーネントの内側の余白を取得する.
+      #
+      def padding_right
+        @style.padding[1]
+      end
+
+      ##########################################################################
+      #
+      # コンポーネントの内側の余白を取得する.
+      #
+      def padding_bottom
+        @style.padding[2]
+      end
+
+      ##########################################################################
+      #
+      # コンポーネントの内側の余白を取得する.
+      #
+      def padding_left
+        @style.padding[3]
       end
 
       ##########################################################################
@@ -432,7 +495,7 @@ module DXRuby
       def draw
         if visible?
           draw_bg if @style.bg
-          draw_image(x + padding, y + padding) if image
+          draw_image(x + padding_left, y + padding_top) if image
           draw_border if @style.border_width and @style.border_color
         end
       end
@@ -505,7 +568,9 @@ module DXRuby
       # コンポーネント内部の幅を取得する.
       #
       def inner_width(parent)
-        parent.width - [parent.padding, self.margin].max * 2
+        parent.width -
+          [parent.padding_left, self.margin_left].max +
+          [parent.padding_right + self.margin_right].max
       end
 
       ##########################################################################
@@ -513,7 +578,9 @@ module DXRuby
       # コンポーネント内部の高さを取得する.
       #
       def inner_height(parent)
-        parent.height - [parent.padding, self.margin].max * 2
+        parent.height -
+          [parent.padding_top, self.margin_top].max +
+          [parent.padding_bottom, self.margin_bottom].max
       end
 
       ##########################################################################
@@ -568,7 +635,9 @@ module DXRuby
         when Float
           @width = parent.width * @style.width
         when :full
-          @width = parent.width - [parent.margin, self.margin].max * 2
+          @width = parent.width -
+            [parent.margin_left, self.margin_left].max +
+            [parent.margin_right, self.margin_right].max
         else
           @width = nil
         end
@@ -578,7 +647,9 @@ module DXRuby
         when Float
           @height = parent.height * @style.height
         when :full
-          @height = parent.height - [parent.margin, self.margin].max * 2
+          @height = parent.height -
+            [parent.margin_top, self.margin_top].max +
+            [parent.margin_bottom, self.margin_bottom].max
         else
           @height = nil
         end

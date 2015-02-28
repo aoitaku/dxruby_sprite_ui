@@ -82,7 +82,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   #
   def draw
     super
-    TextRenderer.draw(x + padding, y + padding, self, context) if visible?
+    TextRenderer.draw(x + padding_left, y + padding_top, self, context) if visible?
   end
 
   ##############################################################################
@@ -97,7 +97,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     else
       text.each_line.map {|line|
         font.get_width(line)
-      }.max + padding * 2
+      }.max + padding_left + padding_right
     end
   end
 
@@ -111,7 +111,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     if text.empty?
       super
     else
-      font.size * (text.each_line.to_a.size) + padding * 2
+      font.size * (text.each_line.to_a.size) + padding_top + padding_bottom
     end
   end
 
