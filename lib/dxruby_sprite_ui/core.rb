@@ -569,8 +569,8 @@ module DXRuby
       #
       def inner_width(parent)
         parent.width -
-          [parent.padding_left, self.margin_left].max +
-          [parent.padding_right + self.margin_right].max
+          ([parent.padding_left, self.margin_left].max +
+           [parent.padding_right + self.margin_right].max)
       end
 
       ##########################################################################
@@ -579,8 +579,8 @@ module DXRuby
       #
       def inner_height(parent)
         parent.height -
-          [parent.padding_top, self.margin_top].max +
-          [parent.padding_bottom, self.margin_bottom].max
+          ([parent.padding_top, self.margin_top].max +
+           [parent.padding_bottom, self.margin_bottom].max)
       end
 
       ##########################################################################
@@ -657,9 +657,7 @@ module DXRuby
         when Float
           @width = parent.width * @style.width
         when :full
-          @width = parent.width -
-            [parent.margin_left, self.margin_left].max +
-            [parent.margin_right, self.margin_right].max
+          @width = inner_width(parent)
         else
           @width = nil
         end
@@ -669,9 +667,7 @@ module DXRuby
         when Float
           @height = parent.height * @style.height
         when :full
-          @height = parent.height -
-            [parent.margin_top, self.margin_top].max +
-            [parent.margin_bottom, self.margin_bottom].max
+          @height = inner_height(parent)
         else
           @height = nil
         end
