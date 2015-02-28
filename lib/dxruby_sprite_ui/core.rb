@@ -588,6 +588,17 @@ module DXRuby
       # コンポーネントの座標の更新.
       #
       def move(to_x, to_y, parent)
+        move_x(to_x, parent)
+        move_y(to_y, parent)
+      end
+
+      ##########################################################################
+      #
+      # コンポーネントの x 座標の更新.
+      #
+      # Private
+      #
+      def move_x(to_x, parent)
         if left and Numeric === left
           case left
           when Integer
@@ -605,6 +616,16 @@ module DXRuby
         else
           self.x = to_x
         end
+      end
+      private :move_x
+
+      ##########################################################################
+      #
+      # コンポーネントの y 座標の更新.
+      #
+      # Private
+      #
+      def move_y(to_y, parent)
         if top and Numeric === top
           case top
           when Integer
@@ -623,6 +644,7 @@ module DXRuby
           self.y = to_y
         end
       end
+      private :move_y
 
       ##########################################################################
       #
