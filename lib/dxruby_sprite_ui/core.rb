@@ -286,6 +286,10 @@ module DXRuby
       #
       def_delegators :@style, :position
       def_delegators :@style, :top, :left, :bottom, :right
+      def_delegators :@style, :padding_top, :padding_bottom
+      def_delegators :@style, :padding_left, :padding_right
+      def_delegators :@style, :bg
+      def_delegators :@style, :border_width, :border_color
       def_delegators :@style, :visible?
 
       ##########################################################################
@@ -413,7 +417,7 @@ module DXRuby
         when :absolute
           0
         else
-          @style.margin[0]
+          @style.margin_top
         end
       end
 
@@ -426,7 +430,7 @@ module DXRuby
         when :absolute
           0
         else
-          @style.margin[1]
+          @style.margin_right
         end
       end
 
@@ -439,7 +443,7 @@ module DXRuby
         when :absolute
           0
         else
-          @style.margin[2]
+          @style.margin_bottom
         end
       end
 
@@ -452,40 +456,8 @@ module DXRuby
         when :absolute
           0
         else
-          @style.margin[3]
+          @style.margin_left
         end
-      end
-
-      ##########################################################################
-      #
-      # コンポーネントの内側の余白を取得する.
-      #
-      def padding_top
-        @style.padding[0]
-      end
-
-      ##########################################################################
-      #
-      # コンポーネントの内側の余白を取得する.
-      #
-      def padding_right
-        @style.padding[1]
-      end
-
-      ##########################################################################
-      #
-      # コンポーネントの内側の余白を取得する.
-      #
-      def padding_bottom
-        @style.padding[2]
-      end
-
-      ##########################################################################
-      #
-      # コンポーネントの内側の余白を取得する.
-      #
-      def padding_left
-        @style.padding[3]
       end
 
       ##########################################################################
@@ -494,9 +466,9 @@ module DXRuby
       #
       def draw
         if visible?
-          draw_bg if @style.bg
+          draw_bg if bg
           draw_image(x + padding_left, y + padding_top) if image
-          draw_border if @style.border_width and @style.border_color
+          draw_border if border_width and border_color
         end
       end
 
@@ -505,7 +477,7 @@ module DXRuby
       # 背景を描画する.
       #
       def draw_bg
-        (target or Window).draw_scale(x, y, @style.bg, width, height, 0, 0)
+        (target or Window).draw_scale(x, y, bg, width, height, 0, 0)
       end
 
       ##########################################################################
@@ -513,7 +485,7 @@ module DXRuby
       # 枠線を描画する.
       #
       def draw_border
-        draw_box(x, y, x + width, y + height, @style.border_width, @style.border_color)
+        draw_box(x, y, x + width, y + height, border_width, border_color)
       end
 
       ##########################################################################
@@ -529,10 +501,12 @@ module DXRuby
       # 直線を描画する.
       #
       def draw_line(x0, y0, x1, y1, width, color)
+        x1 += width - 1
+        y1 += width - 1
         if width == 1
-          (target or Window).draw_line(x0, y0, x1 + width - 1, y1 + width - 1, color)
+          (target or Window).draw_line(x0, y0, x1, y1, color)
         else
-          (target or Window).draw_box_fill(x0, y0, x1 + width - 1, y1 + width - 1, color)
+          (target or Window).draw_box_fill(x0, y0, x1, y1, color)
         end
       end
 
