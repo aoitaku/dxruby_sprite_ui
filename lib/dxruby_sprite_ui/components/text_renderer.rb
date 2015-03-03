@@ -53,7 +53,7 @@ module DXRuby::SpriteUI::TextRenderer
     draw_font = (target or Window).method(params[:aa] ? :draw_font_ex : :draw_font)
     text.each_line.inject(y) do |y, line|
       if params[:text_align] == :fill
-        align_fill(draw_font, line, drawable)
+        align_fill(draw_font, y, line, drawable)
       else
         draw_font[align[line], y, line.chomp, font, params]
       end
@@ -61,7 +61,7 @@ module DXRuby::SpriteUI::TextRenderer
     end
   end
 
-  def self.align_fill(draw_font, text, drawable)
+  def self.align_fill(draw_font, y, text, drawable)
     curr = text[0]
     chars = text.each_char.slice_before {|e|
       curr, prev = e, curr
