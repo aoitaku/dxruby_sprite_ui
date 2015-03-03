@@ -7,7 +7,50 @@
 #
 ################################################################################
 
+module DXRuby::SpriteUI
 
+  class TextDrawable
+
+    attr_accessor :x, :y, :width, :inner_width
+    attr_reader :text, :font
+
+    def initialize(x, y, width, text, font)
+      @x = x
+      @y = y
+      @width = width
+      @text = text
+      @texts = []
+      @font = font
+    end
+
+    def separate_text
+      text.each_line.inject(y) do |y, line|
+        curr = line[0]
+        buffers = line.each_char.slice_before {|e|
+          curr, prev = e, curr
+          /\s/ === e or not (e + prev).ascii_only?
+        }.reject {|buffer| buffer.reject {|c| /\s/ === c }.empty? }.to_a
+        pad = (width - font.get_width(buffers.join)) / (buffers.size - 1)
+        @texts = []
+        buffers.inject(x) do |x, buffer|
+          @texts << [x, y, buffer.join]
+          x + font.get_width(buffer.join) + pad
+        end
+        y + font.size
+      end
+    end
+
+    def text_align(align)
+      case align
+      when :center
+        self.x += (width - font.get_width(text)) / 2
+      when :right
+        self.x += width - font.get_width(text)
+      end
+    end
+
+  end
+end
 
 ################################################################################
 #
