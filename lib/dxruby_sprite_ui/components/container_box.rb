@@ -7,27 +7,14 @@
 #
 ################################################################################
 
-
-
 ################################################################################
 #
-# ContainerBox クラス.
+# Layouter モジュール.
 #
-class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
+module DXRuby::SpriteUI::Layouter
 
   # layout プロパティ.
   attr_writer :layout
-
-  ##############################################################################
-  #
-  # インスタンスの初期化.
-  #
-  # See: SpriteUI::Container#initialize
-  #
-  def initialize(*args)
-    super
-    self.layout = :vertical_box
-  end
 
   ##############################################################################
   #
@@ -214,5 +201,26 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
     end
   end
   private :horizontal_box_move
+
+end
+
+################################################################################
+#
+# ContainerBox クラス.
+#
+class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
+
+  include DXRuby::SpriteUI::Layouter
+
+  ##############################################################################
+  #
+  # インスタンスの初期化.
+  #
+  # See: SpriteUI::Container#initialize
+  #
+  def initialize(*args)
+    super
+    self.layout = :vertical_box
+  end
 
 end
