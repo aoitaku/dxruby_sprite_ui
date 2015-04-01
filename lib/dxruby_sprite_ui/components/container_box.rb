@@ -88,7 +88,7 @@ module DXRuby::SpriteUI::Layouter
       row.inject(0) do |width, component|
         h_space = [h_margin, component.margin_left].max + width
         x = self.x + h_space
-        y = self.y + v_space + (max_component_height - component.height) / 2
+        y = self.y + v_space
         component.move(x, y, self)
         next width if component.position == :absolute
         h_margin = component.margin_right
@@ -193,7 +193,7 @@ module DXRuby::SpriteUI::Layouter
     components.inject(0) do |width, component|
       h_space = [h_margin, component.margin_left].max + width
       x = self.x + h_space
-      y = self.y + (self.height - component.height) / 2
+      y = self.y + [padding_top, component.margin_top].max
       component.move(x, y, self)
       next width if component.position == :absolute
       h_margin = component.margin_right
