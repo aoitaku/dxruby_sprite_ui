@@ -7,50 +7,7 @@
 #
 ################################################################################
 
-module DXRuby::SpriteUI
 
-  class TextDrawable
-
-    attr_accessor :x, :y, :width, :inner_width
-    attr_reader :text, :font
-
-    def initialize(x, y, width, text, font)
-      @x = x
-      @y = y
-      @width = width
-      @text = text
-      @texts = []
-      @font = font
-    end
-
-    def separate_text
-      text.each_line.inject(y) do |y, line|
-        curr = line[0]
-        buffers = line.each_char.slice_before {|e|
-          curr, prev = e, curr
-          /\s/ === e or not (e + prev).ascii_only?
-        }.reject {|buffer| buffer.reject {|c| /\s/ === c }.empty? }.to_a
-        pad = (width - font.get_width(buffers.join)) / (buffers.size - 1)
-        @texts = []
-        buffers.inject(x) do |x, buffer|
-          @texts << [x, y, buffer.join]
-          x + font.get_width(buffer.join) + pad
-        end
-        y + font.size
-      end
-    end
-
-    def text_align(align)
-      case align
-      when :center
-        self.x += (width - font.get_width(text)) / 2
-      when :right
-        self.x += width - font.get_width(text)
-      end
-    end
-
-  end
-end
 
 ################################################################################
 #
@@ -60,12 +17,14 @@ end
 #
 class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
 
+  include DXRuby::SpriteUI::Layouter
+
   # Readables:
   #
-  #   - text: 描画するテキスト.
+  #   - components: 描画するテキストの配列.
   #   - font: 描画に用いるフォント (DXRuby::Font オブジェクト).
   #
-  attr_reader :text, :font
+  attr_reader :components, :font
 
   # Accessors:
   #
@@ -84,6 +43,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   #
   def initialize(id='', text='', x=0, y=0, *argv)
     super(id, x, y)
+    self.layout = :vertical_box
     self.text = text
     @font = Font.default
   end
@@ -114,7 +74,9 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   #   - text : テキストラベルに表示する文字列.
   #
   def text=(text)
-    @text = text.to_s
+    text_object = DXRuby::SpriteUI::Text.new
+    text_object.text = text.to_s
+    @components = [text_object]
   end
 
   ##############################################################################
@@ -125,47 +87,14 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   #
   def draw
     super
-    TextRenderer.draw(x + padding_left, y + padding_top, self, context) if visible?
-  end
-
-  ##############################################################################
-  #
-  # 領域の幅を取得する.
-  #
-  # テキストの描画幅にパディングを含めた幅を返す.
-  #
-  def content_width
-    if text.empty?
-      super
-    else
-      text.each_line.map {|line|
-        font.get_width(line)
-      }.max + padding_left + padding_right
-    end
-  end
-
-  ##############################################################################
-  #
-  # 領域の高さを取得する.
-  #
-  # テキストの描画高さにパディングを含めた高さを返す.
-  #
-  def content_height
-    if text.empty?
-      super
-    else
-      font.size * (text.each_line.to_a.size) + padding_top + padding_bottom
-    end
-  end
-
-  ##############################################################################
-  #
-  # 描画コンテキストを取得する.
-  #
-  # Returns: SpriteUI::Context
-  #
-  def context
-    Context[target, font]
+    params = draw_params
+    components.each {|component|
+      if params[:aa]
+        (target or Window).draw_font_ex(component.x, component.y, component.text, font, params)
+      else
+        (target or Window).draw_font(component.x, component.y, component.text, font, params)
+      end
+    } if visible?
   end
 
   ##############################################################################
@@ -200,16 +129,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
       param[:color] = color
     end
     param[:aa] = aa || text_edge || text_shadow
-    [text, param]
-  end
-
-  ##############################################################################
-  #
-  # コンポーネントの領域の更新.
-  #
-  def resize(parent)
-    super
-    update_collision
+    param
   end
 
 end
