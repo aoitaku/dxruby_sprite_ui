@@ -177,7 +177,7 @@ module DXRuby::SpriteUI::Layouter
       h_margin = component.margin_right
       h_space + component.width
     } + [h_margin, padding_right].max
-    component = components.max_by(&:layout_width)
+    component = components.max_by(&:layout_height)
     @computed_height = component.height +
       [component.margin_top, padding_top].max +
       [component.margin_bottom, padding_bottom].max
