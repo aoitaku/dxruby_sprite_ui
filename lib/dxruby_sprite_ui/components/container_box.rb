@@ -16,6 +16,10 @@ module DXRuby::SpriteUI::Layouter
   # layout プロパティ.
   attr_writer :layout
 
+  # justify_content プロパティ
+  # align_items プロパティ
+  attr_accessor :justify_content, :align_items
+
   ##############################################################################
   #
   # コンポーネントの領域の更新.
@@ -84,20 +88,48 @@ module DXRuby::SpriteUI::Layouter
       max_component_height = component.height
       v_space = [v_margin, component.margin_top].max + height
       v_margin = component.margin_bottom
-      h_margin = padding_left
-      row.inject(0) do |width, component|
-        h_space = [h_margin, component.margin_left].max + width
-        x = self.x + h_space
-        y = self.y + v_space
+      inner_width = row.inject(0, &row_injection) + [row.last.margin_right, padding_right].max
+      row.inject(0, &row_injection {|component, h_space|
+        x = self.x + h_space + case justify_content
+        when :space_between
+          if row.size > 1
+            h_space += (self.width - inner_width) / (row.size - 1)
+          end
+          0
+        when :center
+          (self.width - inner_width) / 2
+        when :right
+          self.width - inner_width
+        else
+          0
+        end
+        y = self.y + v_space + case align_items
+        when :center
+          (max_component_height - component.height) / 2
+        when :bottom
+          max_component_height - component.height
+        else
+          0
+        end
         component.move(x, y, self)
-        next width if component.position == :absolute
-        h_margin = component.margin_right
-        h_space + component.width
-      end
+        h_space
+      })
       v_space + max_component_height
     end
   end
   private :flow_move
+
+  def row_injection(&with)
+    h_margin = padding_left
+    -> width, component do
+      h_space = [h_margin, component.margin_left].max + width
+      h_space = with.call(component, h_space, width) if with
+      next width if component.position == :absolute
+      h_margin = component.margin_right
+      h_space + component.width
+    end
+  end
+  private :row_injection
 
   ##############################################################################
   #
@@ -153,9 +185,29 @@ module DXRuby::SpriteUI::Layouter
   def vertical_box_move
     v_margin = padding_top
     components.inject(0) do |height, component|
+      h_space = [padding_left, component.margin_left].max
       v_space = [v_margin, component.margin_top].max + height
-      x = self.x + [padding_left, component.margin_left].max
-      y = self.y + v_space
+      x = self.x + h_space + case justify_content
+      when :center
+        (component.inner_width(self) - component.width) / 2
+      when :right
+        component.inner_width(self) - component.width
+      else
+        0
+      end
+      y = self.y + v_space + case align_items
+      when :space_between
+        if @height and components.size > 1
+          v_space += (@height - @computed_height) / (components.size - 1)
+        end
+        0
+      when :center
+        @height ? (@height - @computed_height) / 2 : 0
+      when :bottom
+        @height ? @height - @computed_height : 0
+      else
+        0
+      end
       component.move(x, y, self)
       next height if component.position == :absolute
       v_margin = component.margin_bottom
@@ -192,8 +244,28 @@ module DXRuby::SpriteUI::Layouter
     h_margin = padding_left
     components.inject(0) do |width, component|
       h_space = [h_margin, component.margin_left].max + width
-      x = self.x + h_space
-      y = self.y + [padding_top, component.margin_top].max
+      v_space = [padding_top, component.margin_top].max
+      x = self.x + h_space + case justify_content
+      when :space_between
+        if @width and components.size > 1
+          h_space += (@width - @computed_width) / (components.size - 1)
+        end
+        0
+      when :center
+        @width ? (@width - @computed_width) / 2 : 0
+      when :right
+        @width ? @width - @computed_width : 0
+      else
+        0
+      end
+      y = self.y + v_space + case align_items
+      when :center
+        (component.inner_height(self) - component.height) / 2
+      when :bottom
+        component.inner_height(self) - component.height
+      else
+        0
+      end
       component.move(x, y, self)
       next width if component.position == :absolute
       h_margin = component.margin_right
@@ -220,6 +292,8 @@ class Quincite::UI::ContainerBox < DXRuby::SpriteUI::Container
   #
   def initialize(*args)
     super
+    self.justify_content = :left
+    self.align_items = :top
     self.layout = :vertical_box
   end
 
