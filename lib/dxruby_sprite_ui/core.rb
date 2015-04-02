@@ -532,7 +532,7 @@ module DXRuby
       #
       # コンポーネントの配置.
       #
-      def layout(ox=0, oy=0, parent=Window)
+      def layout(ox=0, oy=0, parent=DXRuby::Window)
         resize(parent)
         move(ox, oy, parent)
       end
@@ -542,9 +542,13 @@ module DXRuby
       # コンポーネント内部の幅を取得する.
       #
       def inner_width(parent)
-        parent.width -
-          ([parent.padding_left, self.margin_left].max +
-           [parent.padding_right + self.margin_right].max)
+        if parent == DXRuby::Window
+          parent.width - (self.margin_left + self.margin_right)
+        else
+          parent.width -
+            ([parent.padding_left, self.margin_left].max +
+             [parent.padding_right, self.margin_right].max)
+        end
       end
 
       ##########################################################################
@@ -552,9 +556,13 @@ module DXRuby
       # コンポーネント内部の高さを取得する.
       #
       def inner_height(parent)
-        parent.height -
-          ([parent.padding_top, self.margin_top].max +
-           [parent.padding_bottom, self.margin_bottom].max)
+        if parent == DXRuby::Window 
+          parent.height - (self.margin_top + self.margin_bottom)
+        else
+          parent.height -
+            ([parent.padding_top, self.margin_top].max +
+             [parent.padding_bottom, self.margin_bottom].max)
+        end
       end
 
       ##########################################################################
