@@ -23,8 +23,9 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   #
   #   - components: 描画するテキストの配列.
   #   - font: 描画に用いるフォント (DXRuby::Font オブジェクト).
+  #   - text_align: 描画するテキストの水平位置揃え.
   #
-  attr_reader :components, :font
+  attr_reader :components, :font, :text_align
 
   # Accessors:
   #
@@ -33,7 +34,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   #   - text_edge   : 袋文字のパラメータ.
   #   - text_shadow : 文字影のパラメータ.
   #
-  attr_accessor :aa, :color, :text_edge, :text_shadow, :text_align
+  attr_accessor :aa, :color, :text_edge, :text_shadow
 
   ##############################################################################
   #
@@ -45,6 +46,9 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     super(id, x, y)
     self.layout = :vertical_box
     self.text = text
+    @align_items = :top
+    @justify_content = :left
+    @components = []
     @font = Font.default
   end
 
@@ -74,9 +78,15 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   #   - text : テキストラベルに表示する文字列.
   #
   def text=(text)
-    text_object = DXRuby::SpriteUI::Text.new
-    text_object.text = text.to_s
-    @components = [text_object]
+    @components = text.to_s.each_line.map do |line|
+      DXRuby::SpriteUI::Text.new.tap do |text_object|
+        text_object.text = line
+      end
+    end
+  end
+
+  def text_align=(align)
+    @justify_content = align
   end
 
   ##############################################################################
@@ -86,15 +96,19 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   # See: SpriteUI::TextRenderer.draw
   #
   def draw
+    return unless visible?
     super
-    params = draw_params
-    components.each {|component|
-      if params[:aa]
-        (target or Window).draw_font_ex(component.x, component.y, component.text, font, params)
-      else
-        (target or Window).draw_font(component.x, component.y, component.text, font, params)
-      end
-    } if visible?
+    # 事前にパラメータを用意しておく
+    param = draw_params
+    # 描画方式の選択
+    draw = (target or Window).method(aa? && :draw_font_ex || :draw_font)
+    components.each do |component|
+      draw.(component.x, component.y, component.text, font, param)
+    end
+  end
+
+  def aa?
+    aa || text_edge || text_shadow
   end
 
   ##############################################################################
@@ -122,13 +136,9 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
         param[:shadow_y] = text_shadow[:y] if text_shadow[:y]
       end
     end
-    if text_align
-      param[:text_align] = text_align
-    end
     if color
       param[:color] = color
     end
-    param[:aa] = aa || text_edge || text_shadow
     param
   end
 
