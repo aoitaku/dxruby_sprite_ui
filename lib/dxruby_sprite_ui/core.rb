@@ -138,7 +138,7 @@ module DXRuby
       #
       # ƒ}[ƒWƒ“‚ğİ’è‚·‚é.
       #
-      def margin=(*args)
+      def margin=(args)
         case args
         when Numeric
           @margin = [args] * 4
