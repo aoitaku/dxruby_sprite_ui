@@ -581,22 +581,32 @@ module DXRuby
       # Private
       #
       def move_x(to_x, parent)
-        if left and Numeric === left
-          case left
-          when Integer
-            self.x = to_x + left
-          when Float
-            self.x = to_x + (inner_width(parent) - self.width) * left
-          end
-        elsif right and Numeric === right
-          case right
-          when Integer
-            self.x = to_x + inner_width(parent) - self.width - right
-          when Float
-            self.x = to_x - (inner_width(parent) - self.width) * (right - 1)
+        if position == :absolute
+          if left and Numeric === left
+            case left
+            when Fixnum
+              self.x = to_x + left
+            when Float
+              self.x = to_x + (parent.width - self.width) * left
+            end
+          elsif right and Numeric === right
+            case left
+            when Fixnum
+              self.x = to_x + parent.width - self.width - right
+            when Float
+              self.x = to_x + (parent.width - self.width) * (right - 1)
+            end
+          else
+            self.x = to_x
           end
         else
-          self.x = to_x
+          if left and Numeric === left
+            self.x = to_x + left
+          elsif right and Numeric === right
+            self.x = to_x + inner_width(parent) - self.width - right
+          else
+            self.x = to_x
+          end
         end
       end
       private :move_x
@@ -608,22 +618,32 @@ module DXRuby
       # Private
       #
       def move_y(to_y, parent)
-        if top and Numeric === top
-          case top
-          when Integer
-            self.y = to_y + top
-          when Float
-            self.y = to_y + (inner_height(parent) - self.height) * top
-          end
-        elsif bottom and Numeric === bottom
-          case bottom
-          when Integer
-            self.y = to_y + inner_height(parent) - self.height - bottom
-          when Float
-            self.y = to_y - (inner_height(parent) - self.height) * (bottom - 1)
+        if position == :absolute
+          if top and Numeric === top
+            case top
+            when Fixnum
+              self.y = to_y + top
+            when Float
+              self.y = to_y + (parent.height - self.height) * top
+            end
+          elsif bottom and Numeric === bottom
+            case bottom
+            when Fixnum
+              self.y = to_y + parent.height - self.height - bottom
+            when Float
+              self.y = to_y + (parent.height - self.height) * (bottom - 1)
+            end
+          else
+            self.y = to_y
           end
         else
-          self.y = to_y
+          if top and Numeric === top
+            self.y = to_y + top
+          elsif bottom and Numeric === bottom
+            self.y = to_y + inner_height(parent) - self.height - bottom
+          else
+            self.y = to_y
+          end
         end
       end
       private :move_y

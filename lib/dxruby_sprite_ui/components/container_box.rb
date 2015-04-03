@@ -111,7 +111,11 @@ module DXRuby::SpriteUI::Layouter
         else
           0
         end
-        component.move(x, y, self)
+        if component.position == :absolute
+          component.move(self.x, self.y, self)
+        else
+          component.move(x, y, self)
+        end
         h_space
       })
       v_space + max_component_height
@@ -208,7 +212,11 @@ module DXRuby::SpriteUI::Layouter
       else
         0
       end
-      component.move(x, y, self)
+      if component.position == :absolute
+        component.move(self.x, self.y, self)
+      else
+        component.move(x, y, self)
+      end
       next height if component.position == :absolute
       v_margin = component.margin_bottom
       v_space + component.height
@@ -266,7 +274,11 @@ module DXRuby::SpriteUI::Layouter
       else
         0
       end
-      component.move(x, y, self)
+      if component.position == :absolute
+        component.move(self.x, self.y, self)
+      else
+        component.move(x, y, self)
+      end
       next width if component.position == :absolute
       h_margin = component.margin_right
       h_space + component.width
