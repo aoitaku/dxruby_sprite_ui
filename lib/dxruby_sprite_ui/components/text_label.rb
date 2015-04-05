@@ -7,7 +7,7 @@
 #
 ################################################################################
 
-
+require 'unicode/line_break'
 
 ################################################################################
 #
@@ -16,6 +16,17 @@
 # 文字列を描画するためのシンプルなコンポーネント.
 #
 class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
+
+  def self.unicode
+    unless @unicode
+      @unicode = Unicode::DB.new
+    end
+    @unicode
+  end
+
+  def unicode
+    Quincite::UI::TextLabel.unicode
+  end
 
   include DXRuby::SpriteUI::Layouter
 
@@ -48,7 +59,6 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     self.text = text
     @align_items = :top
     @justify_content = :left
-    @components = []
     @font = Font.default
   end
 
@@ -70,6 +80,65 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     end
   end
 
+  def text=(text)
+    @text = text
+  end
+
+  def flow_segment
+    @components = @text.each_line.map do |line|
+      DXRuby::SpriteUI::Text.new.tap do |text_object|
+        text_object.text = line
+      end
+    end
+  end
+  private :flow_segment
+
+  def vertical_segment
+    @components = @text.each_line.map do |line|
+      DXRuby::SpriteUI::Text.new.tap do |text_object|
+        text_object.text = line
+      end
+    end
+  end
+  private :vertical_segment
+
+  def narrow?(char)
+    return false unless char
+    case unicode.east_asian_width(char.ord)
+    when Unicode::EastAsianWidth::N, Unicode::EastAsianWidth::Na
+      true
+    else
+      false
+    end
+  end
+
+  def horizontal_segment
+    @components = @text.each_char.slice_before {|char|
+      curr, prev = char, curr
+      /\s/ === char or (not narrow?(char) and not narrow?(prev))
+    }.reject {|chars| chars.all? {|char| /\s/ === char}}.map do |word|
+      DXRuby::SpriteUI::Text.new.tap do |text_object|
+        text_object.text = word.join
+      end
+    end
+  end
+  private :horizontal_segment
+
+  def flow_resize
+    flow_segment
+    super
+  end
+
+  def vertical_box_resize
+    vertical_segment
+    super
+  end
+
+  def horizontal_box_resize
+    horizontal_segment
+    super
+  end
+
   ##############################################################################
   #
   # 文字列を設定する.
@@ -78,11 +147,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   #   - text : テキストラベルに表示する文字列.
   #
   def text=(text)
-    @components = text.to_s.each_line.map do |line|
-      DXRuby::SpriteUI::Text.new.tap do |text_object|
-        text_object.text = line
-      end
-    end
+    @text = text.to_s
   end
 
   def text_align=(align)
