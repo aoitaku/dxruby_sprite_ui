@@ -107,6 +107,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
       false
     end
   end
+  private :narrow?
 
   def horizontal_segment
     @components = @text.each_char.slice_before {|char|
