@@ -89,6 +89,10 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   end
   private :flow_segment
 
+  # 現実装だと垂直レイアウトでは均等割はできない.
+  # 均等割するときは入れ子にしないといけない.
+  # 現在の Text クラスのような文字～語句単位のオブジェクトとは別に,
+  # 複数の文字～語句をひとまとまりにした行単位のオブジェクトが必要かも.
   def vertical_segment
     @components = @text.each_line.map do |line|
       DXRuby::SpriteUI::Text.new.tap do |text_object|
