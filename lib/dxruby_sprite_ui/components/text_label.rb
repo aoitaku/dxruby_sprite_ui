@@ -80,10 +80,6 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     end
   end
 
-  def text=(text)
-    @text = text
-  end
-
   def flow_segment
     @components = @text.each_line.map do |line|
       DXRuby::SpriteUI::Text.new.tap do |text_object|
