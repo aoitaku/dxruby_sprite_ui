@@ -117,11 +117,11 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     @components = @text.each_char.slice_before {|char|
       curr, prev = char, curr
       /\s/ === char or (not narrow?(char) and not narrow?(prev))
-    }.reject {|chars| chars.all? {|char| /\s/ === char}}.map do |word|
+    }.lazy.map(&:join).reject {|word| /\s/ === word }.map {|word|
       DXRuby::SpriteUI::Text.new.tap do |text_object|
-        text_object.text = word.join
+        text_object.text = word
       end
-    end
+    }.to_a
   end
   private :horizontal_segment
 
