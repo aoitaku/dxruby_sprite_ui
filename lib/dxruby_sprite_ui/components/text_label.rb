@@ -93,14 +93,14 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   # 均等割するときは入れ子にしないといけない.
   # 現在の Text クラスのような文字～語句単位のオブジェクトとは別に,
   # 複数の文字～語句をひとまとまりにした行単位のオブジェクトが必要かも.
-  def vertical_segment
+  def vertical_box_segment
     @components = @text.each_line.map do |line|
       DXRuby::SpriteUI::Text.new.tap do |text_object|
         text_object.text = line
       end
     end
   end
-  private :vertical_segment
+  private :vertical_box_segment
 
   def narrow?(char)
     return false unless char
@@ -113,7 +113,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   end
   private :narrow?
 
-  def horizontal_segment
+  def horizontal_box_segment
     @components = @text.each_char.slice_before {|char|
       curr, prev = char, curr
       /\s/ === char or (not narrow?(char) and not narrow?(prev))
@@ -123,7 +123,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
       end
     }.to_a
   end
-  private :horizontal_segment
+  private :horizontal_box_segment
 
   def flow_resize
     flow_segment
@@ -131,12 +131,12 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   end
 
   def vertical_box_resize
-    vertical_segment
+    vertical_box_segment
     super
   end
 
   def horizontal_box_resize
-    horizontal_segment
+    horizontal_box_segment
     super
   end
 
