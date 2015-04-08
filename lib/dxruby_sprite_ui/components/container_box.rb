@@ -60,8 +60,6 @@ module DXRuby::SpriteUI::Layouter
   #
   # 子コンポーネントの resize を行う.
   #
-  # TODO: 最後の行だけ左寄せにしたい
-  #
   def flow_resize
     v_margin = padding_top
     @computed_width = (@width or (image and image.width) or Window.width)
@@ -82,6 +80,8 @@ module DXRuby::SpriteUI::Layouter
   # フローレイアウト時のコンポーネントの座標を更新する.
   #
   # 子コンポーネントの move を行う.
+  #
+  # TODO: 最後の行だけ左寄せにしたい
   #
   def flow_move
     v_margin = padding_top
