@@ -19,13 +19,21 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
 
   def self.unicode
     unless @unicode
-      @unicode = Unicode::DB.new
+      db = Unicode::DB.new
+      @unicode = {
+        line_break: Unicode::LineBreak.new(db),
+        east_asian_width: Unicode::EastAsianWidth.new(db)
+      }
     end
     @unicode
   end
 
-  def unicode
-    Quincite::UI::TextLabel.unicode
+  def line_break
+    Quincite::UI::TextLabel.unicode[:line_break]
+  end
+
+  def east_asian_width
+    Quincite::UI::TextLabel.unicode[:east_asian_width]
   end
 
   include DXRuby::SpriteUI::Layouter
@@ -80,12 +88,17 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     end
   end
 
+  # 行に分割するのは flow_resize 側に任せる.
+  # flow_segment では禁則処理を行って分割可能位置で分割を行う.
   def flow_segment
-    @components = @text.each_line.map do |line|
-      DXRuby::SpriteUI::Text.new.tap do |text_object|
-        text_object.text = line
-      end
-    end
+    max_width = @width
+    @components = @text.split.map {|chars|
+      line_break.breakables(chars).map {|word|
+        DXRuby::SpriteUI::Text.new.tap do |text_object|
+          text_object.text = word
+        end
+      }.to_a
+    }.flatten
   end
   private :flow_segment
 
@@ -104,7 +117,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
 
   def narrow?(char)
     return false unless char
-    case unicode.east_asian_width(char.ord)
+    case east_asian_width.east_asian_width(char.ord)
     when Unicode::EastAsianWidth::N, Unicode::EastAsianWidth::Na
       true
     else
