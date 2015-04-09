@@ -99,7 +99,7 @@ module DXRuby::SpriteUI::Layouter
           end
           0
         when :center
-          (self.width - inner_width) / 2
+          (self.width - inner_width) / 2.0
         when :right
           self.width - inner_width
         else
@@ -107,7 +107,7 @@ module DXRuby::SpriteUI::Layouter
         end
         y = self.y + v_space + case align_items
         when :center
-          (max_component_height - component.height) / 2
+          (max_component_height - component.height) / 2.0
         when :bottom
           max_component_height - component.height
         else
@@ -154,7 +154,7 @@ module DXRuby::SpriteUI::Layouter
       if force_break
         force_break = component.break_after?
         width = h_space
-        h_margin = padding_top
+        h_margin = padding_left
         next true
       else
         force_break = component.break_after?
@@ -162,11 +162,11 @@ module DXRuby::SpriteUI::Layouter
       expected_width = width + component.layout_width + padding_left + padding_right
       if width > 0 and expected_width > max_width
         width = h_space
-        h_margin = padding_top
+        h_margin = padding_left
         true
       else
         width += h_space
-        h_margin = component.margin_bottom
+        h_margin = component.margin_right
         false
       end
     end
