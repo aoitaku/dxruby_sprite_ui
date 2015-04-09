@@ -53,7 +53,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   #   - text_edge   : 袋文字のパラメータ.
   #   - text_shadow : 文字影のパラメータ.
   #
-  attr_accessor :aa, :color, :text_edge, :text_shadow
+  attr_accessor :aa, :color, :text_edge, :text_shadow, :line_height
 
   ##############################################################################
   #
@@ -65,6 +65,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     super(id, x, y)
     self.layout = :vertical_box
     self.text = text
+    @line_height = 1.0
     @align_items = :top
     @justify_content = :left
     @font = Font.default
@@ -92,11 +93,18 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   # flow_segment では禁則処理を行って分割可能位置で分割を行う.
   def flow_segment
     max_width = @width
+    line_margin = case line_height
+    when Float
+      (font.size * line_height - font.size) / 2.0
+    when Fixnum
+      (line_height - font.size) / 2.0
+    end
     @components = @text.each_line.flat_map {|line|
       line.split.flat_map {|chars|
         line_break.breakables(chars).map {|word|
           DXRuby::SpriteUI::Text.new.tap do |text_object|
             text_object.text = word
+            text_object.style_set(:margin, [line_margin, 0])
           end
         }.to_a
       }.tap {|line| line.last.style_set(:break_after, true) }
