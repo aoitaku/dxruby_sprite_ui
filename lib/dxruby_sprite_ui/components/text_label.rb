@@ -92,13 +92,15 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   # flow_segment では禁則処理を行って分割可能位置で分割を行う.
   def flow_segment
     max_width = @width
-    @components = @text.split.map {|chars|
-      line_break.breakables(chars).map {|word|
-        DXRuby::SpriteUI::Text.new.tap do |text_object|
-          text_object.text = word
-        end
-      }.to_a
-    }.flatten
+    @components = @text.each_line.flat_map {|line|
+      line.split.flat_map {|chars|
+        line_break.breakables(chars).map {|word|
+          DXRuby::SpriteUI::Text.new.tap do |text_object|
+            text_object.text = word
+          end
+        }.to_a
+      }.tap {|line| line.last.style_set(:break_after, true) }
+    }
   end
   private :flow_segment
 

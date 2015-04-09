@@ -94,8 +94,8 @@ module DXRuby::SpriteUI::Layouter
       row.inject(0, &row_injection {|component, h_space|
         x = self.x + h_space + case justify_content
         when :space_between
-          if row.size > 1
-            h_space += (self.width - inner_width) / (row.size - 1)
+          if row.size > 1 and not row.last.break_after?
+            h_space += (self.width - inner_width) / (row.size - 1).to_f
           end
           0
         when :center
@@ -148,8 +148,17 @@ module DXRuby::SpriteUI::Layouter
     width = 0
     max_width = @computed_width
     -> component {
+    force_break = false
       next false if component.position == :absolute
-      h_space = [h_margin, component.margin_top].max + component.width
+      h_space = [h_margin, component.margin_left].max + component.width
+      if force_break
+        force_break = component.break_after?
+        width = h_space
+        h_margin = padding_top
+        next true
+      else
+        force_break = component.break_after?
+      end
       expected_width = width + component.layout_width + padding_left + padding_right
       if width > 0 and expected_width > max_width
         width = h_space

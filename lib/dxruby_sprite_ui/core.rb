@@ -85,6 +85,7 @@ module DXRuby
       attr_accessor :width, :height
       attr_accessor :position, :top, :left, :bottom, :right
       attr_accessor :visible
+      attr_accessor :break_after
 
       ##########################################################################
       #
@@ -104,6 +105,7 @@ module DXRuby
         @bottom = nil
         @right = nil
         @visible = true
+        @break_after = false
       end
 
       ##########################################################################
@@ -261,6 +263,17 @@ module DXRuby
         @visible
       end
 
+      ##########################################################################
+      #
+      # ブレークポイントの有無を取得する.
+      #
+      # Returns:
+      # 
+      #
+      def break_after?
+        @break_after
+      end
+
     end
 
     ############################################################################
@@ -291,6 +304,7 @@ module DXRuby
       def_delegators :@style, :bg
       def_delegators :@style, :border_width, :border_color
       def_delegators :@style, :visible?
+      def_delegators :@style, :break_after?
 
       ##########################################################################
       #
