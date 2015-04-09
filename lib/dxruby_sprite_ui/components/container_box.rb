@@ -129,7 +129,7 @@ module DXRuby::SpriteUI::Layouter
     h_margin = padding_left
     -> width, component do
       h_space = [h_margin, component.margin_left].max + width
-      h_space = with.call(component, h_space, width) if with
+      h_space = with.call(component, h_space) if with
       next width if component.position == :absolute
       h_margin = component.margin_right
       h_space + component.width
@@ -147,8 +147,8 @@ module DXRuby::SpriteUI::Layouter
     h_margin = padding_top
     width = 0
     max_width = @computed_width
-    -> component {
     force_break = false
+    -> component do
       next false if component.position == :absolute
       h_space = [h_margin, component.margin_left].max + component.width
       if force_break
@@ -169,7 +169,7 @@ module DXRuby::SpriteUI::Layouter
         h_margin = component.margin_bottom
         false
       end
-    }
+    end
   end
   private :components_overflow?
 
