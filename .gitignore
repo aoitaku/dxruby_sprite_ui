@@ -16,3 +16,5 @@
 *.o
 *.a
 mkmf.log
+example/licenses/
+example/assets/
