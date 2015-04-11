@@ -187,9 +187,11 @@ module DXRuby::SpriteUI::Layouter
       v_space + component.height
     } + [v_margin, padding_bottom].max
     component = components.max_by(&:layout_width)
-    @computed_width = component.width +
-      [component.margin_left, padding_left].max +
-      [component.margin_right, padding_right].max
+    if component
+      @computed_width = component.width +
+        [component.margin_left, padding_left].max +
+        [component.margin_right, padding_right].max
+    end
   end
   private :vertical_box_resize
 
@@ -249,9 +251,11 @@ module DXRuby::SpriteUI::Layouter
       h_space + component.width
     } + [h_margin, padding_right].max
     component = components.max_by(&:layout_height)
-    @computed_height = component.height +
-      [component.margin_top, padding_top].max +
-      [component.margin_bottom, padding_bottom].max
+    if component
+      @computed_height = component.height +
+        [component.margin_top, padding_top].max +
+        [component.margin_bottom, padding_bottom].max
+    end
   end
   private :horizontal_box_resize
 
