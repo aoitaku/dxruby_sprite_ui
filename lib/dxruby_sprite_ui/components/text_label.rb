@@ -89,89 +89,6 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     end
   end
 
-  # 行に分割するのは flow_resize 側に任せる.
-  # flow_segment では禁則処理を行って分割可能位置で分割を行う.
-  def flow_segment
-    max_width = @width
-    text_margin = [line_spacing, 0]
-    @components = @text.each_line.flat_map {|line|
-      line.split.flat_map {|chars|
-        line_break.breakables(chars).map {|word|
-          DXRuby::SpriteUI::Text.new.tap do |text_object|
-            text_object.text = word
-            text_object.style_set(:margin, text_margin)
-          end
-        }.to_a
-      }.tap {|line| line.last.style_set(:break_after, true) }
-    }
-  end
-  private :flow_segment
-
-  def line_spacing
-    case line_height
-    when Float
-      (font.size * line_height - font.size) / 2.0
-    when Fixnum
-      (line_height - font.size) / 2.0
-    end
-  end
-  private :line_margin
-
-  # 現実装だと垂直レイアウトでは均等割はできない.
-  # 均等割するときは入れ子にしないといけない.
-  # 現在の Text クラスのような文字～語句単位のオブジェクトとは別に,
-  # 複数の文字～語句をひとまとまりにした行単位のオブジェクトが必要かも.
-  def vertical_box_segment
-    text_margin = [line_spacing, 0]
-    @components = @text.each_line.map do |line|
-      DXRuby::SpriteUI::Text.new.tap do |text_object|
-        text_object.text = line
-        text_object.style_set(:margin, text_margin)
-      end
-    end
-  end
-  private :vertical_box_segment
-
-  def narrow?(char)
-    return false unless char
-    case east_asian_width.east_asian_width(char.ord)
-    when Unicode::EastAsianWidth::N, Unicode::EastAsianWidth::Na
-      true
-    else
-      false
-    end
-  end
-  private :narrow?
-
-  def horizontal_box_segment
-    text_margin = [line_spacing, 0]
-    @components = @text.each_char.slice_before {|char|
-      curr, prev = char, curr
-      /\s/ === char or (not narrow?(char) and not narrow?(prev))
-    }.lazy.map(&:join).reject {|word| /\s/ === word }.map {|word|
-      DXRuby::SpriteUI::Text.new.tap do |text_object|
-        text_object.text = word
-        text_object.style_set(:margin, text_margin)
-      end
-    }.to_a
-  end
-  private :horizontal_box_segment
-
-  def flow_resize
-    flow_segment
-    super
-  end
-
-  def vertical_box_resize
-    vertical_box_segment
-    super
-  end
-
-  def horizontal_box_resize
-    horizontal_box_segment
-    super
-  end
-
   ##############################################################################
   #
   # 文字列を設定する.
@@ -239,5 +156,88 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     end
     param
   end
+
+  def flow_resize
+    flow_segment
+    super
+  end
+
+  def vertical_box_resize
+    vertical_box_segment
+    super
+  end
+
+  def horizontal_box_resize
+    horizontal_box_segment
+    super
+  end
+
+  # 行に分割するのは flow_resize 側に任せる.
+  # flow_segment では禁則処理を行って分割可能位置で分割を行う.
+  def flow_segment
+    max_width = @width
+    text_margin = [line_spacing, 0]
+    @components = @text.each_line.flat_map {|line|
+      line.split.flat_map {|chars|
+        line_break.breakables(chars).map {|word|
+          DXRuby::SpriteUI::Text.new.tap do |text_object|
+            text_object.text = word
+            text_object.style_set(:margin, text_margin)
+          end
+        }.to_a
+      }.tap {|line| line.last.style_set(:break_after, true) }
+    }
+  end
+  private :flow_segment
+
+  def line_spacing
+    case line_height
+    when Float
+      (font.size * line_height - font.size) / 2.0
+    when Fixnum
+      (line_height - font.size) / 2.0
+    end
+  end
+  private :line_margin
+
+  # 現実装だと垂直レイアウトでは均等割はできない.
+  # 均等割するときは入れ子にしないといけない.
+  # 現在の Text クラスのような文字～語句単位のオブジェクトとは別に,
+  # 複数の文字～語句をひとまとまりにした行単位のオブジェクトが必要かも.
+  def vertical_box_segment
+    text_margin = [line_spacing, 0]
+    @components = @text.each_line.map do |line|
+      DXRuby::SpriteUI::Text.new.tap do |text_object|
+        text_object.text = line
+        text_object.style_set(:margin, text_margin)
+      end
+    end
+  end
+  private :vertical_box_segment
+
+  def horizontal_box_segment
+    text_margin = [line_spacing, 0]
+    @components = @text.each_char.slice_before {|char|
+      curr, prev = char, curr
+      /\s/ === char or (not narrow?(char) and not narrow?(prev))
+    }.lazy.map(&:join).reject {|word| /\s/ === word }.map {|word|
+      DXRuby::SpriteUI::Text.new.tap do |text_object|
+        text_object.text = word
+        text_object.style_set(:margin, text_margin)
+      end
+    }.to_a
+  end
+  private :horizontal_box_segment
+
+  def narrow?(char)
+    return false unless char
+    case east_asian_width.east_asian_width(char.ord)
+    when Unicode::EastAsianWidth::N, Unicode::EastAsianWidth::Na
+      true
+    else
+      false
+    end
+  end
+  private :narrow?
 
 end
