@@ -481,7 +481,7 @@ module DXRuby
       def draw
         if visible?
           draw_bg if bg
-          draw_image(x + padding_left, y + padding_top) if image
+          draw_image(x, y) if image
           draw_border if border_width and border_color
         end
       end
