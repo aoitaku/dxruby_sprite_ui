@@ -198,7 +198,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
       (line_height - font.size) / 2.0
     end
   end
-  private :line_margin
+  private :line_spacing
 
   # 現実装だと垂直レイアウトでは均等割はできない.
   # 均等割するときは入れ子にしないといけない.
