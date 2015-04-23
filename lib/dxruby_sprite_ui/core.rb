@@ -615,9 +615,19 @@ module DXRuby
           end
         else
           if left and Numeric === left
-            self.x = to_x + left
+            case left
+            when Fixnum
+              self.x = to_x + left
+            when Float
+              self.x = to_x + left * self.width
+            end
           elsif right and Numeric === right
-            self.x = to_x + inner_width(parent) - self.width - right
+            case right
+            when Fixnum
+              self.x = to_x - right
+            when Float
+              self.x = to_x - right * self.width
+            end
           else
             self.x = to_x
           end
@@ -652,9 +662,19 @@ module DXRuby
           end
         else
           if top and Numeric === top
-            self.y = to_y + top
+            case top
+            when Fixnum
+              self.y = to_y + top
+            when Float
+              self.y = to_y + top * self.height
+            end
           elsif bottom and Numeric === bottom
-            self.y = to_y + inner_height(parent) - self.height - bottom
+            case bottom
+            when Fixnum
+              self.y = to_y - bottom
+            when Float
+              self.y = to_y - bottom * self.height
+            end
           else
             self.y = to_y
           end
