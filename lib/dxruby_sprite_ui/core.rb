@@ -8,6 +8,7 @@
 ################################################################################
 
 require 'dxruby'
+require 'forwardable'
 require 'quincite'
 
 module DXRuby
