@@ -30,6 +30,7 @@ gem 'dxruby_sprite_ui', :git => "https://github.com/aoitaku/dxruby_sprite_ui.git
 
 DXRuby 用のライブラリのため、別途 DXRuby をインストールする必要があります。
 
+DXRuby はバージョン 1.4.1 以降をお使いください。なお、開発版と正式版とどちらでも使えるように Bundler 経由で DXRuby を読み込むようにはなっていません（開発版には gem がないため）。
 
 ## 使い方
 
