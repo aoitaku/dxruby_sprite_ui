@@ -352,8 +352,6 @@ module DXRuby
       def width
         if @width
           @width
-        elsif @computed_width
-          @computed_width
         else
           content_width
         end
@@ -364,7 +362,9 @@ module DXRuby
       # 内容物に応じた幅を取得する.
       #
       def content_width
-        if image
+        if @content_width
+          @content_width
+        elsif image
           image.width
         else
           0
@@ -378,8 +378,6 @@ module DXRuby
       def height
         if @height
           @height
-        elsif @computed_height
-          @computed_height
         else
           content_height
         end
@@ -390,7 +388,9 @@ module DXRuby
       # 内容物に応じた高さを取得する.
       #
       def content_height
-        if image
+        if @content_height
+          @content_height
+        elsif image
           image.height
         else
           0

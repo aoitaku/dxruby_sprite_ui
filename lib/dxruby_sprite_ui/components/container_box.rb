@@ -62,8 +62,8 @@ module DXRuby::SpriteUI::Layouter
   #
   def flow_resize
     v_margin = padding_top
-    @computed_width = (@width or (image and image.width) or Window.width)
-    @computed_height = components.lazy.each {|component|
+    @content_width = (@width or (image and image.width) or Window.width)
+    @content_height = components.lazy.each {|component|
       component.resize(self)
     }.slice_before(&components_overflow?).inject(0) {|height, row|
       component = row.max_by(&:layout_height)
@@ -146,7 +146,7 @@ module DXRuby::SpriteUI::Layouter
   def components_overflow?
     h_margin = padding_top
     width = 0
-    max_width = @computed_width
+    max_width = @content_width
     force_break = false
     -> component do
       next false if component.position == :absolute
@@ -179,7 +179,7 @@ module DXRuby::SpriteUI::Layouter
   #
   def vertical_box_resize
     v_margin = padding_top
-    @computed_height = components.inject(0) {|height, component|
+    @content_height = components.inject(0) {|height, component|
       component.resize(self)
       next height if component.position == :absolute
       v_space = [v_margin, component.margin_top].max + height
@@ -188,7 +188,7 @@ module DXRuby::SpriteUI::Layouter
     } + [v_margin, padding_bottom].max
     component = components.max_by(&:layout_width)
     if component
-      @computed_width = component.width +
+      @content_width = component.width +
         [component.margin_left, padding_left].max +
         [component.margin_right, padding_right].max
     end
@@ -215,13 +215,13 @@ module DXRuby::SpriteUI::Layouter
       y = self.y + v_space + case align_items
       when :space_between
         if @height and components.size > 1
-          v_space += (@height - @computed_height) / (components.size - 1)
+          v_space += (@height - @content_height) / (components.size - 1)
         end
         0
       when :center
-        @height ? (@height - @computed_height) / 2 : 0
+        @height ? (@height - @content_height) / 2 : 0
       when :bottom
-        @height ? @height - @computed_height : 0
+        @height ? @height - @content_height : 0
       else
         0
       end
@@ -243,7 +243,7 @@ module DXRuby::SpriteUI::Layouter
   #
   def horizontal_box_resize
     h_margin = padding_left
-    @computed_width = components.inject(0) {|width, component|
+    @content_width = components.inject(0) {|width, component|
       component.resize(self)
       next width if component.position == :absolute
       h_space = [h_margin, component.margin_left].max + width
@@ -252,7 +252,7 @@ module DXRuby::SpriteUI::Layouter
     } + [h_margin, padding_right].max
     component = components.max_by(&:layout_height)
     if component
-      @computed_height = component.height +
+      @content_height = component.height +
         [component.margin_top, padding_top].max +
         [component.margin_bottom, padding_bottom].max
     end
@@ -271,13 +271,13 @@ module DXRuby::SpriteUI::Layouter
       x = self.x + h_space + case justify_content
       when :space_between
         if @width and components.size > 1
-          h_space += (@width - @computed_width) / (components.size - 1)
+          h_space += (@width - @content_width) / (components.size - 1)
         end
         0
       when :center
-        @width ? (@width - @computed_width) / 2 : 0
+        @width ? (@width - @content_width) / 2 : 0
       when :right
-        @width ? @width - @computed_width : 0
+        @width ? @width - @content_width : 0
       else
         0
       end
