@@ -13,7 +13,7 @@
 #
 # 文字列を描画するためのシンプルなコンポーネント.
 #
-class DXRuby::SpriteUI::Text < DXRuby::SpriteUI::Base
+class DXRuby::SpriteUI::Text < DXRuby::SpriteUI::Component
 
   # Readables:
   #

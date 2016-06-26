@@ -13,7 +13,7 @@
 #
 class Quincite::UI::ListBox < Quincite::UI::ContainerBox
 
-  
-  
+
+
 
 end
