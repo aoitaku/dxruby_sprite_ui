@@ -21,7 +21,7 @@ class Quincite::UI::VBox < Quincite::UI::ContainerBox
   #
   def initialize(*args)
     super
-    self.layout = :vertical_box
+    self.style_set = :vertical_box
   end
 
 end

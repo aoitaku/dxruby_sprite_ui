@@ -21,7 +21,7 @@ class Quincite::UI::HBox < Quincite::UI::ContainerBox
   #
   def initialize(*args)
     super
-    self.layout = :horizontal_box
+    self.style_set = :horizontal_box
   end
 
 end

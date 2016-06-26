@@ -15,7 +15,7 @@ module DXRuby
 
   ##############################################################################
   #
-  # SpriteUI ƒ‚ƒWƒ…[ƒ‹.
+  # SpriteUI ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«.
   #
   module SpriteUI
 
@@ -23,498 +23,69 @@ module DXRuby
 
     ############################################################################
     #
-    # ƒrƒ‹ƒ_[ DSL ‚ğÀs‚µ‚Ä UI ƒcƒŠ[‚ğ\’z‚·‚é.
+    # ãƒ“ãƒ«ãƒ€ãƒ¼ DSL ã‚’å®Ÿè¡Œã—ã¦ UI ãƒ„ãƒªãƒ¼ã‚’æ§‹ç¯‰ã™ã‚‹.
     #
     def self.build(&proc)
+      Quincite::UI.max_width = Window.width
+      Quincite::UI.max_height = Window.height
+
       UI.build(UI::ContainerBox, &proc)
     end
 
     ############################################################################
     #
-    # SpriteUI ‚Éƒ‚ƒWƒ…[ƒ‹‚ğŠ„‚è“–‚Ä‚é.
+    # SpriteUI ã«ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã‚’å‰²ã‚Šå½“ã¦ã‚‹.
     #
     def self.equip(mod)
-      Base.__send__(:include, const_get(mod))
+      Component.__send__(:include, const_get(mod))
     end
 
-    ############################################################################
-    #
-    # ColorUtils ƒ‚ƒWƒ…[ƒ‹
-    #
-    module ColorUtils
-
-      ##########################################################################
-      #
-      # ˆø”‚ğF”z—ñ‚ğ¶¬‚·‚é.
-      #
-      # Params:
-      #   - color :
-      #
-      def self.make_color(color)
-        case color
-        when Array
-          color
-        when Fixnum
-          [color >> 16 & 0xff,
-           color >> 8 & 0xff,
-           color & 0xff]
-        when /^#[0-9a-fA-F]{6}$/
-          [color[1..2].hex,
-           color[3..4].hex,
-           color[5..6].hex]
-        else
-          nil
-        end
-      end
-
-    end
-
-    ############################################################################
-    #
-    # StyleSet ƒNƒ‰ƒX.
-    #
-    class StyleSet
-
-      # 
-      #
-      attr_reader :bg
-      attr_reader :margin, :padding
-
-      # 
-      #
-      attr_accessor :border_width, :border_color
-      attr_accessor :width, :height
-      attr_accessor :position, :top, :left, :bottom, :right
-      attr_accessor :visible
-      attr_accessor :break_after
-
-      ##########################################################################
-      #
-      # ‰Šú‰».
-      #
-      def initialize
-        @margin = [0, 0, 0, 0]
-        @padding = [0, 0, 0, 0]
-        @bg = nil
-        @border_width = 0
-        @border_color = [0, 0, 0, 0]
-        @width = nil
-        @height = nil
-        @position = :relative
-        @top = nil
-        @left = nil
-        @bottom = nil
-        @right = nil
-        @visible = true
-        @break_after = false
-      end
-
-      ##########################################################################
-      #
-      # ”wŒiF‚ğİ’è‚·‚é.
-      #
-      def bgcolor=(bgcolor)
-        bgcolor = ColorUtils.make_color(bgcolor)
-        if bgcolor
-          @bg = Image.new(1, 1, bgcolor)
-        else
-          @bg = nil
-        end
-      end
-
-      ##########################################################################
-      #
-      # ˜gü‚ğİ’è‚·‚é.
-      #
-      def border=(border)
-        case border
-        when Hash
-          @border_width = border[:width] || 1
-          @border_color = ColorUtils.make_color(border[:color]) || [255, 255, 255]
-        else
-          @border_width = nil
-          @border_color = nil
-        end
-      end
-
-      ##########################################################################
-      #
-      # ƒ}[ƒWƒ“‚ğİ’è‚·‚é.
-      #
-      def margin=(args)
-        case args
-        when Numeric
-          @margin = [args] * 4
-        when Array
-          case args.size
-          when 1
-            @margin = args * 4
-          when 2
-            @margin = args * 2
-          when 3
-            @margin = [*args, args[1]]
-          when 4
-            @margin = args
-          else
-            @margin = args[0...4]
-          end
-        else
-          @margin = [0, 0, 0, 0]
-        end
-      end
-
-      ##########################################################################
-      #
-      #
-      #
-      def margin_top
-        @margin[0]
-      end
-
-      ##########################################################################
-      #
-      #
-      #
-      def margin_right
-        @margin[1]
-      end
-
-      ##########################################################################
-      #
-      #
-      #
-      def margin_bottom
-        @margin[2]
-      end
-
-      ##########################################################################
-      #
-      #
-      #
-      def margin_left
-        @margin[3]
-      end
-
-      ##########################################################################
-      #
-      # ƒpƒfƒBƒ“ƒO‚ğİ’è‚·‚é.
-      #
-      def padding=(args)
-        case args
-        when Numeric
-          @padding = [args] * 4
-        when Array
-          case args.size
-          when 1
-            @padding = args * 4
-          when 2
-            @padding = args * 2
-          when 3
-            @padding = [*args, args[1]]
-          when 4
-            @padding = args
-          else
-            @padding = args[0...4]
-          end
-        else
-          @padding = [0, 0, 0, 0]
-        end
-      end
-
-      ##########################################################################
-      #
-      #
-      #
-      def padding_top
-        @padding[0]
-      end
-
-      ##########################################################################
-      #
-      #
-      #
-      def padding_right
-        @padding[1]
-      end
-
-      ##########################################################################
-      #
-      #
-      #
-      def padding_bottom
-        @padding[2]
-      end
-
-      ##########################################################################
-      #
-      #
-      #
-      def padding_left
-        @padding[3]
-      end
-
-      ##########################################################################
-      #
-      # ‰Â‹ó‘Ô‚ğæ“¾‚·‚é.
-      #
-      # Returns:
-      # 
-      #
-      def visible?
-        @visible
-      end
-
-      ##########################################################################
-      #
-      # ƒuƒŒ[ƒNƒ|ƒCƒ“ƒg‚Ì—L–³‚ğæ“¾‚·‚é.
-      #
-      # Returns:
-      # 
-      #
-      def break_after?
-        @break_after
-      end
-
-    end
-
-    ############################################################################
-    #
-    # Base ƒNƒ‰ƒX
-    #
-    class Base < Sprite
+    class Component < Sprite
 
       include SpriteUI
+      include UI::Component
       include UI::Control
 
-      extend Forwardable
-
-      # 
-      #
-      attr_accessor :id
-
-      # 
-      #
-      attr_reader :style
-
-      # 
-      #
-      def_delegators :@style, :position
-      def_delegators :@style, :top, :left, :bottom, :right
-      def_delegators :@style, :padding_top, :padding_bottom
-      def_delegators :@style, :padding_left, :padding_right
-      def_delegators :@style, :bg
-      def_delegators :@style, :border_width, :border_color
-      def_delegators :@style, :visible?
-      def_delegators :@style, :break_after?
-
-      ##########################################################################
-      #
-      # ‰Šú‰».
-      #
       def initialize(id='', *args)
         super(0, 0)
+        init_component
+        init_control
         self.id = id
         self.collision = [0, 0]
-        @style = StyleSet.new
-        init_control
       end
 
-      ##########################################################################
-      #
-      # w’è‚³‚ê‚½–¼‘O‚ÌƒXƒ^ƒCƒ‹‚ª‘¶İ‚·‚é‚©”»’è‚ğs‚¤.
-      #
-      # Params:
-      #   - name :
-      #
-      # Returns:
-      #   
-      #
-      def style_include?(name)
-        @style.respond_to?("#{name}=")
+      def update
       end
 
-      ##########################################################################
-      #
-      # ƒXƒ^ƒCƒ‹‚ğİ’è‚·‚é.
-      #
-      # Params:
-      #   - name :
-      #   - args :
-      #
-      def style_set(name, args)
-        @style.__send__("#{name}=", args)
+      def update_collision
+        self.collision = [0, 0, self.width, self.height]
       end
 
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚Ì•‚ğæ“¾‚·‚é.
-      #
-      def width
-        if @width
-          @width
-        elsif @computed_width
-          @computed_width
-        else
-          content_width
-        end
-      end
-
-      ##########################################################################
-      #
-      # “à—e•¨‚É‰‚¶‚½•‚ğæ“¾‚·‚é.
-      #
-      def content_width
-        if image
-          image.width
-        else
-          0
-        end
-      end
-
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚Ì‚‚³‚ğæ“¾‚·‚é.
-      #
-      def height
-        if @height
-          @height
-        elsif @computed_height
-          @computed_height
-        else
-          content_height
-        end
-      end
-
-      ##########################################################################
-      #
-      # “à—e•¨‚É‰‚¶‚½‚‚³‚ğæ“¾‚·‚é.
-      #
-      def content_height
-        if image
-          image.height
-        else
-          0
-        end
-      end
-
-      ##########################################################################
-      #
-      # ”z’uã‚ÌƒRƒ“ƒ|[ƒlƒ“ƒg‚Ì•‚ğæ“¾‚·‚é.
-      #
-      def layout_width
-        case position
-        when :absolute
-          0
-        else
-          width + margin_left + margin_right
-        end
-      end
-
-      ##########################################################################
-      #
-      # ”z’uã‚ÌƒRƒ“ƒ|[ƒlƒ“ƒg‚Ì‚‚³‚ğæ“¾‚·‚é.
-      #
-      def layout_height
-        case position
-        when :absolute
-          0
-        else
-          height + margin_top + margin_bottom
-        end
-      end
-
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚ÌŠO‘¤‚Ì—]”’‚ğæ“¾‚·‚é.
-      #
-      def margin_top
-        case position
-        when :absolute
-          0
-        else
-          @style.margin_top
-        end
-      end
-
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚ÌŠO‘¤‚Ì—]”’‚ğæ“¾‚·‚é.
-      #
-      def margin_right
-        case position
-        when :absolute
-          0
-        else
-          @style.margin_right
-        end
-      end
-
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚ÌŠO‘¤‚Ì—]”’‚ğæ“¾‚·‚é.
-      #
-      def margin_bottom
-        case position
-        when :absolute
-          0
-        else
-          @style.margin_bottom
-        end
-      end
-
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚ÌŠO‘¤‚Ì—]”’‚ğæ“¾‚·‚é.
-      #
-      def margin_left
-        case position
-        when :absolute
-          0
-        else
-          @style.margin_left
-        end
-      end
-
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚Ì•`‰æ.
-      #
       def draw
         if visible?
-          draw_bg if bg
+          draw_bg if bg_image
           draw_image(x, y) if image
           draw_border if border_width and border_color
         end
       end
 
-      ##########################################################################
-      #
-      # ”wŒi‚ğ•`‰æ‚·‚é.
-      #
       def draw_bg
-        (target or Window).draw_scale(x, y, bg, width, height, 0, 0)
+        (target or Window).draw_scale(x, y, bg_image, width, height, 0, 0)
       end
 
-      ##########################################################################
-      #
-      # ˜gü‚ğ•`‰æ‚·‚é.
-      #
       def draw_border
-        draw_box(x, y, x + width, y + height, border_width, border_color)
+        draw_box(x, y, x + width, y + height, border_width, [
+          border_color.alpha,
+          border_color.red,
+          border_color.green,
+          border_color.blue
+        ])
       end
 
-      ##########################################################################
-      #
-      # ‰æ‘œ‚ğ•`‰æ‚·‚é.
-      #
       def draw_image(x, y)
         (target or Window).draw(x, y, image)
       end
 
-      ##########################################################################
-      #
-      # ’¼ü‚ğ•`‰æ‚·‚é.
-      #
       def draw_line(x0, y0, x1, y1, width, color)
         x1 += width - 1
         y1 += width - 1
@@ -525,10 +96,6 @@ module DXRuby
         end
       end
 
-      ##########################################################################
-      #
-      # ‹éŒ`‚Ì‹«ŠEü‚ğ•`‰æ‚·‚é.
-      #
       def draw_box(x0, y0, x1, y1, width, color)
         draw_line(x0, y0, x1 - width, y0, width, color)
         draw_line(x0, y0, x0, y1 - width, width, color)
@@ -536,201 +103,19 @@ module DXRuby
         draw_line(x1 - width, y0, x1 - width, y1 - width, width, color)
       end
 
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚ÌXV.
-      #
-      def update
-      end
-
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚Ì”z’u.
-      #
-      def layout(ox=0, oy=0, parent=DXRuby::Window)
-        resize(parent)
-        move(ox, oy, parent)
-      end
-
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg“à•”‚Ì•‚ğæ“¾‚·‚é.
-      #
-      def inner_width(parent)
-        if parent == DXRuby::Window
-          parent.width - (self.margin_left + self.margin_right)
-        else
-          parent.width -
-            ([parent.padding_left, self.margin_left].max +
-             [parent.padding_right, self.margin_right].max)
-        end
-      end
-
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg“à•”‚Ì‚‚³‚ğæ“¾‚·‚é.
-      #
-      def inner_height(parent)
-        if parent == DXRuby::Window 
-          parent.height - (self.margin_top + self.margin_bottom)
-        else
-          parent.height -
-            ([parent.padding_top, self.margin_top].max +
-             [parent.padding_bottom, self.margin_bottom].max)
-        end
-      end
-
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚ÌÀ•W‚ÌXV.
-      #
-      def move(to_x, to_y, parent)
-        move_x(to_x, parent)
-        move_y(to_y, parent)
-      end
-
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚Ì x À•W‚ÌXV.
-      #
-      # Private
-      #
-      def move_x(to_x, parent)
-        if position == :absolute
-          if left and Numeric === left
-            case left
-            when Fixnum
-              self.x = to_x + left
-            when Float
-              self.x = to_x + (parent.width - self.width) * left
-            end
-          elsif right and Numeric === right
-            case right
-            when Fixnum
-              self.x = to_x + parent.width - self.width - right
-            when Float
-              self.x = to_x + (parent.width - self.width) * (1 - right)
-            end
-          else
-            self.x = to_x
-          end
-        else
-          if left and Numeric === left
-            case left
-            when Fixnum
-              self.x = to_x + left
-            when Float
-              self.x = to_x + left * self.width
-            end
-          elsif right and Numeric === right
-            case right
-            when Fixnum
-              self.x = to_x - right
-            when Float
-              self.x = to_x - right * self.width
-            end
-          else
-            self.x = to_x
-          end
-        end
-      end
-      private :move_x
-
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚Ì y À•W‚ÌXV.
-      #
-      # Private
-      #
-      def move_y(to_y, parent)
-        if position == :absolute
-          if top and Numeric === top
-            case top
-            when Fixnum
-              self.y = to_y + top
-            when Float
-              self.y = to_y + (parent.height - self.height) * top
-            end
-          elsif bottom and Numeric === bottom
-            case bottom
-            when Fixnum
-              self.y = to_y + parent.height - self.height - bottom
-            when Float
-              self.y = to_y + (parent.height - self.height) * (1 - bottom)
-            end
-          else
-            self.y = to_y
-          end
-        else
-          if top and Numeric === top
-            case top
-            when Fixnum
-              self.y = to_y + top
-            when Float
-              self.y = to_y + top * self.height
-            end
-          elsif bottom and Numeric === bottom
-            case bottom
-            when Fixnum
-              self.y = to_y - bottom
-            when Float
-              self.y = to_y - bottom * self.height
-            end
-          else
-            self.y = to_y
-          end
-        end
-      end
-      private :move_y
-
-      ##########################################################################
-      #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚Ì—Ìˆæ‚ÌXV.
-      #
-      def resize(parent)
-        case @style.width
-        when Integer
-          @width = @style.width
-        when Float
-          @width = parent.width * @style.width
-        when :full
-          @width = inner_width(parent)
-        else
-          @width = nil
-        end
-        case @style.height
-        when Integer
-          @height = @style.height
-        when Float
-          @height = parent.height * @style.height
-        when :full
-          @height = inner_height(parent)
-        else
-          @height = nil
-        end
-      end
-
-      ##########################################################################
-      #
-      # ÚG”»’è—Ìˆæ‚ÌXV.
-      #
-      def update_collision
-        self.collision = [0, 0, self.width, self.height]
-      end
-
     end
 
     ############################################################################
     #
-    # Container ƒNƒ‰ƒX.
+    # Container ã‚¯ãƒ©ã‚¹.
     #
-    class Container < Base
+    class Container < Component
 
       include UI::Container
 
       ##########################################################################
       #
-      # ‰Šú‰».
+      # åˆæœŸåŒ–.
       #
       def initialize(*args)
         super
@@ -739,7 +124,7 @@ module DXRuby
 
       ##########################################################################
       #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚Ì•`‰æ.
+      # ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®æç”».
       #
       def draw
         super
@@ -748,7 +133,7 @@ module DXRuby
 
       ##########################################################################
       #
-      # ƒRƒ“ƒ|[ƒlƒ“ƒg‚ÌXV.
+      # ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®æ›´æ–°.
       #
       def update
         super
@@ -756,5 +141,6 @@ module DXRuby
       end
 
     end
+
   end
 end

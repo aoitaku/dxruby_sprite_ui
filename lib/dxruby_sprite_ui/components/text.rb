@@ -13,7 +13,7 @@
 #
 # 文字列を描画するためのシンプルなコンポーネント.
 #
-class DXRuby::SpriteUI::Text < DXRuby::SpriteUI::Base
+class DXRuby::SpriteUI::Text < DXRuby::SpriteUI::Component
 
   # Readables:
   #
@@ -56,8 +56,8 @@ class DXRuby::SpriteUI::Text < DXRuby::SpriteUI::Base
   #
   def resize(parent)
     super
-    @computed_width = parent.font.get_width(text)
-    @computed_height = parent.font.size
+    @content_width = parent.font.get_width(text)
+    @content_height = parent.font.size
     update_collision
     self
   end

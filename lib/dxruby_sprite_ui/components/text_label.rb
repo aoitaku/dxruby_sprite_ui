@@ -15,7 +15,7 @@ require 'unicode/line_break'
 #
 # 文字列を描画するためのシンプルなコンポーネント.
 #
-class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
+class Quincite::UI::TextLabel < DXRuby::SpriteUI::Component
 
   def self.unicode
     unless @unicode
@@ -36,7 +36,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
     Quincite::UI::TextLabel.unicode[:east_asian_width]
   end
 
-  include DXRuby::SpriteUI::Layouter
+  include Quincite::UI::Layouter
 
   # Readables:
   #
@@ -63,7 +63,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Base
   #
   def initialize(id='', text='', x=0, y=0, *argv)
     super(id, x, y)
-    self.layout = :vertical_box
+    self.style_set :layout, :vertical_box
     self.text = text
     @line_height = 1.0
     @align_items = :top
