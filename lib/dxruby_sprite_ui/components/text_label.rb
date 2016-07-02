@@ -42,9 +42,8 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Component
   #
   #   - components: 描画するテキストの配列.
   #   - font: 描画に用いるフォント (DXRuby::Font オブジェクト).
-  #   - text_align: 描画するテキストの水平位置揃え.
   #
-  attr_reader :components, :font, :text_align
+  attr_reader :components, :font
 
   # Accessors:
   #
@@ -66,8 +65,8 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Component
     self.style_set :layout, :vertical_box
     self.text = text
     @line_height = 1.0
-    @align_items = :top
-    @justify_content = :left
+    self.style_set :align_items, :top
+    self.style_set :justify_content, :left
     @font = Font.default
   end
 
@@ -101,7 +100,11 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Component
   end
 
   def text_align=(align)
-    @justify_content = align
+    self.style_set :justify_content, align
+  end
+
+  def text_align
+    self.style.justify_content
   end
 
   ##############################################################################
