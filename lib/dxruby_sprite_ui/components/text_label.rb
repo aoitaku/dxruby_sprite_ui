@@ -121,7 +121,7 @@ class Quincite::UI::TextLabel < DXRuby::SpriteUI::Component
     # 描画方式の選択
     draw = (target or Window).method(aa? && :draw_font_ex || :draw_font)
     components.each do |component|
-      draw.(component.x, component.y, component.text, font, param)
+      draw.(component.x, component.y, component.text, font, param) if component.visible?
     end
   end
 
