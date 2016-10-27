@@ -95,7 +95,7 @@ module DXRuby::SpriteUI
     end
 
     def dispatch
-      target = event_listener.all(:desc).find {|target| target === mouse }
+      target = event_listener.all(:desc).find {|target| target === mouse && target.visible? }
       unless mouse.left_down?
         mouse_prev.hover = mouse.hover
         mouse.hover = target and WeakRef.new(target)
