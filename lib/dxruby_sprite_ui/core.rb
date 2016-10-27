@@ -25,11 +25,13 @@ module DXRuby
     #
     # ビルダー DSL を実行して UI ツリーを構築する.
     #
-    def self.build(&proc)
+    def self.build(container=nil, &proc)
+      container ||= UI::ContainerBox
+
       Quincite::UI.max_width = Window.width
       Quincite::UI.max_height = Window.height
 
-      UI.build(UI::ContainerBox, &proc)
+      UI.build(container, &proc)
     end
 
     ############################################################################
@@ -45,6 +47,10 @@ module DXRuby
       include SpriteUI
       include UI::Component
       include UI::Control
+
+      def self.build(&proc)
+        SpriteUI.build(self, &proc)
+      end
 
       def initialize(id='', *args)
         super(0, 0)
